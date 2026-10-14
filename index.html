@@ -150,6 +150,11 @@ kbd{background:#2a1018;border:1px solid #6a2030;border-radius:4px;padding:0 5px;
 @media (max-width:560px){.agrid{grid-template-columns:1fr}}
 button,.sk,.ib,.slot,.tnode,.tab,.plus{touch-action:manipulation}
 html,body{-webkit-touch-callout:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+
+#dunTag{display:flex;align-items:center;gap:6px;background:rgba(30,10,50,.75);padding:3px 10px;border-radius:12px;font-size:12px;border:1px solid #6a3aa0;color:#d8c0ff}
+.dhead{font-size:26px;font-weight:bold;display:flex;align-items:center;gap:10px;margin-bottom:6px}.dhead span{font-size:34px}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0}.dgrid div{background:rgba(255,255,255,.05);border-radius:8px;padding:6px 10px;font-size:12px;color:#a99;display:flex;justify-content:space-between;gap:8px}.dgrid b{color:#eee}
+.ver{font-size:11px;color:#8a6a7a;letter-spacing:1px}
 </style>
 </head>
 <body>
@@ -168,6 +173,7 @@ html,body{-webkit-touch-callout:none;-webkit-text-size-adjust:100%;text-size-adj
 <div id="topright" class="hud">
   <canvas id="mini" width="160" height="160"></canvas>
   <div id="clockRow"><canvas id="clockCv" width="56" height="56" style="width:28px;height:28px"></canvas><span><b id="dayTxt">第 1 天</b> <span id="timeTxt">20:00</span></span></div>
+  <div id="dunTag" class="hidden"></div>
   <div id="iconBtns"><button class="ib" id="mapBtn" title="大地圖 (M)">🗺</button><button class="ib" id="achBtn" title="成就 (K)">🏆</button><button class="ib" id="questBtn" title="任務 (L)">📜<i id="questDot"></i></button><button class="ib" id="bagBtn" title="背包/屬性 (B)">🎒<i id="bagDot"></i></button><button class="ib" id="muteBtn" title="靜音">🔊</button><button class="ib" id="pauseBtn" title="暫停 (P)">❚❚</button></div>
 </div>
 <div id="toasts" class="hud"></div>
@@ -179,11 +185,11 @@ html,body{-webkit-touch-callout:none;-webkit-text-size-adjust:100%;text-size-adj
 <div id="startScreen" class="screen">
   <div class="panel">
     <h1>血 夜</h1>
-    <div class="sub">CRIMSON NIGHT · 吸血鬼之影</div>
+    <div class="sub">CRIMSON NIGHT · 吸血鬼之影 <span class="ver" id="verTag"></span></div>
     <div class="help">
       <div><b>🎮 電腦操作</b><br><kbd>WASD</kbd>/方向鍵 移動<br>滑鼠 瞄準・<kbd>左鍵</kbd>/<kbd>空白</kbd> 攻擊<br><kbd>E</kbd> 吸血/開寶箱・<kbd>Q</kbd> 血瓶<br><kbd>1</kbd>~<kbd>4</kbd> 技能（右鍵 = 血矢）<br><kbd>B</kbd> 背包・<kbd>C</kbd> 屬性・<kbd>T</kbd> 天賦・<kbd>L</kbd> 任務・<kbd>K</kbd> 成就<br><kbd>F5</kbd>/<kbd>F9</kbd> 快速存/讀檔・<kbd>M</kbd> 地圖・<kbd>P</kbd> 暫停</div>
       <div><b>📱 手機操作</b><br>左半螢幕拖曳 = 虛擬搖桿<br>右下按鈕：攻擊 / 吸血 / 技能 / 血瓶<br>右上 📜 任務・🎒 背包與屬性<br>攻擊自動瞄準最近的敵人<br>點小地圖開大地圖</div>
-      <div><b>☀ 日夜輪替</b><br>白天陽光會灼燒你！躲進<b>樹林</b>、<b>房屋</b>或<b>城堡</b>的陰影。白天森林裡有<b>樵夫</b>可吸血；<b>陰雨／濃霧</b>天可外出；在<b>棺材</b>旁可沉睡至黃昏；小心獵魔人<b>突襲城堡</b>。</div>
+      <div><b>☀ 日夜輪替</b><br>白天陽光會灼燒你！躲進<b>樹林</b>、<b>房屋</b>或<b>城堡</b>的陰影。白天森林裡有<b>樵夫</b>可吸血；<b>陰雨／濃霧</b>天可外出；在<b>棺材</b>旁可沉睡至黃昏；小心獵魔人<b>突襲城堡</b>。地圖上的 🕳 <b>地下城</b>沒有陽光，白天也能挑戰！</div>
       <div><b>🩸 吸血</b><br>靠近人類按吸血：回復生命與血液。<br>騎士→狂暴　神父→抗陽<br>法師→奧術　貴族→疾行吸血<br>血液會隨時間流失，別讓它見底。</div>
     </div>
     <div style="font-size:12px;color:#a88">地圖被迷霧籠罩，走過才會揭開。擊敗怪物與開啟 📦 寶箱可獲得金幣、裝備與藥水，到城堡或村莊的 💰 商人交易；升級獲得屬性點與天賦點。棺材可快速回復生命。每夜都更危險…</div>
@@ -202,7 +208,7 @@ html,body{-webkit-touch-callout:none;-webkit-text-size-adjust:100%;text-size-adj
 </div>
 <div id="pauseScreen" class="screen hidden">
   <div class="panel">
-    <h1 style="font-size:36px">暫 停</h1>
+    <h1 style="font-size:36px">暫 停</h1><div class="ver" id="verPause"></div>
     <div class="vol"><label>🎵 音樂 <input type="range" id="volM" min="0" max="100"></label><label>🔊 音效 <input type="range" id="volS" min="0" max="100"></label></div>
     <button class="btn" id="resumeBtn">繼續</button><br>
     <button class="btn sec" id="saveMenuBtn">💾 存檔 / 讀檔</button><button class="btn sec" id="achPauseBtn">🏆 成就</button><button class="btn sec" id="restartBtn">重新開始</button>
@@ -237,6 +243,7 @@ html,body{-webkit-touch-callout:none;-webkit-text-size-adjust:100%;text-size-adj
   </div>
 </div>
 <div id="achPop"></div>
+<div id="dunScreen" class="screen hidden"><div class="panel bagp" id="dunBody"></div></div>
 <div id="saveScreen" class="screen hidden">
   <div class="panel bagp">
     <div class="bagHead"><div class="iname" id="saveTitle">💾 存檔</div><button class="ib" id="saveClose">✕</button></div>
@@ -251,11 +258,11 @@ html,body{-webkit-touch-callout:none;-webkit-text-size-adjust:100%;text-size-adj
 'use strict';
 // ================= 基本工具 =================
 const TILE=32, MW=150, MH=150, DAY_LEN=360;
-const T={GRASS:0,ROAD:1,WATER:2,FOREST:3,WALL:4,FLOOR:5,GRAVE:6,CASTLE:7,ROCK:8,COFFIN:9,BRIDGE:10,CWALL:11};
-const SOLID=new Uint8Array(16);[T.WATER,T.WALL,T.ROCK,T.CWALL].forEach(t=>SOLID[t]=1);
-const SHADE=new Uint8Array(16);[T.FOREST,T.FLOOR,T.CASTLE,T.COFFIN].forEach(t=>SHADE[t]=1);
-const PROJ_BLOCK=new Uint8Array(16);[T.WALL,T.ROCK,T.CWALL].forEach(t=>PROJ_BLOCK[t]=1);
-const TCOL={0:[50,80,42],1:[122,102,74],2:[26,56,92],3:[20,50,24],4:[120,96,82],5:[150,108,64],6:[74,68,60],7:[84,44,92],8:[112,112,118],9:[220,30,50],10:[150,108,64],11:[44,32,56]};
+const T={GRASS:0,ROAD:1,WATER:2,FOREST:3,WALL:4,FLOOR:5,GRAVE:6,CASTLE:7,ROCK:8,COFFIN:9,BRIDGE:10,CWALL:11,DFLOOR:12,DWALL:13};
+const SOLID=new Uint8Array(16);[T.WATER,T.WALL,T.ROCK,T.CWALL,T.DWALL].forEach(t=>SOLID[t]=1);
+const SHADE=new Uint8Array(16);[T.FOREST,T.FLOOR,T.CASTLE,T.COFFIN,T.DFLOOR].forEach(t=>SHADE[t]=1);
+const PROJ_BLOCK=new Uint8Array(16);[T.WALL,T.ROCK,T.CWALL,T.DWALL].forEach(t=>PROJ_BLOCK[t]=1);
+const TCOL={0:[50,80,42],1:[122,102,74],2:[26,56,92],3:[20,50,24],4:[120,96,82],5:[150,108,64],6:[74,68,60],7:[84,44,92],8:[112,112,118],9:[220,30,50],10:[150,108,64],11:[44,32,56],12:[46,40,54],13:[12,10,16]};
 const rand=(a,b)=>a+Math.random()*(b-a);
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const angDiff=(a,b)=>{let d=a-b;while(d>Math.PI)d-=Math.PI*2;while(d<-Math.PI)d+=Math.PI*2;return d};
@@ -288,7 +295,8 @@ const ENEMIES={
   lich:{name:'墓穴巫妖',hp:620,spd:55,dmg:16,r:18,xp:220,range:300,cd:1.6,ranged:true,boss:true,aggro:520,proj:'dark',pspd:240,home:1.2},
   countess:{name:'血伯爵夫人',hp:720,spd:118,dmg:18,r:16,xp:280,range:36,cd:1.0,lunge:true,boss:true,aggro:560},
   inquis:{name:'審判官 瓦勒留斯',hp:680,spd:88,dmg:22,r:17,xp:260,range:40,cd:1.4,lunge:true,boss:true,aggro:520},
-  templar:{name:'聖殿騎士',hp:95,spd:74,dmg:13,r:13,xp:26,range:32,cd:1.3,lunge:true,aggro:420}};
+  templar:{name:'聖殿騎士',hp:95,spd:74,dmg:13,r:13,xp:26,range:32,cd:1.3,lunge:true,aggro:420},
+  skeleton:{name:'骷髏戰士',hp:50,spd:70,dmg:10,r:12,xp:14,range:28,cd:1.2,aggro:340}};
 const SKILLS=[
   {id:'bolt',name:'血矢',key:'1',cost:10,cd:0.9,lvl:1,icon:'🩸'},
   {id:'bats',name:'蝙蝠群',key:'2',cost:25,cd:7,lvl:2,icon:'🦇'},
@@ -485,6 +493,9 @@ function sfx(n){if(!AC)return;const now=performance.now();if(lastS[n]&&now-lastS
     case'questNew':tone(392,.3,'triangle',.07);tone(587,.4,'triangle',.07,0,.15);break;
     case'ach':[784,988,1175,1568,1976].forEach((f,i)=>tone(f,.35,'triangle',.07,0,i*.08));tone(392,.8,'sine',.06,0,.1);noise(.4,.04,7000,2,.35);break;
     case'rain':noise(2.6,.045,2600,.3);if(Math.random()<.12)noise(1.6,.14,90,.5,.3,40);break;
+    case'bones':for(let i=0;i<5;i++)tone(700+Math.random()*900,.05,'square',.03,300,i*.045);noise(.2,.06,2500,2);break;
+    case'drip':tone(1800,.08,'sine',.04,900);tone(1300,.1,'sine',.02,650,.06);break;
+    case'groan':tone(85,1.4,'sawtooth',.03,55);noise(1.2,.03,300,1);break;
     case'salvage':noise(.25,.1,1800,1,0,300);tone(400,.2,'triangle',.05,150);break;
   }}
 
@@ -500,6 +511,7 @@ const SONGS={
   title:{bpm:64,div:2,steps:8,prog:[[50,53,57],[46,50,53],[43,46,50],[45,49,52]],arp:[0,1,2,1,2,1,0,1],bell:.35,pad:.05,arpV:.03,bass:.07},
   night:{bpm:84,div:2,steps:8,prog:[[50,53,57],[46,50,53],[48,52,55],[45,49,52],[50,53,57],[43,46,50],[46,50,53],[45,49,52]],arp:[0,1,2,3,2,1,2,1],drums:'soft',bell:.25,pad:.045,arpV:.038,bass:.08},
   day:{bpm:58,div:2,steps:8,prog:[[45,48,52],[46,50,53],[45,48,52],[44,48,51]],arp:[0,-1,2,-1,1,-1,3,-1],bell:.15,pad:.05,arpV:.028,bass:.06,drone:true},
+  dungeon:{bpm:54,div:2,steps:8,prog:[[45,48,52],[44,48,51],[41,45,48],[43,47,50]],arp:[0,-1,-1,2,-1,-1,1,-1],bell:.3,pad:.04,arpV:.026,bass:.07,drone:true},
   boss:{bpm:150,div:4,steps:16,prog:[[50,53,57],[46,50,53],[48,52,55],[45,49,52]],arp:[0,1,2,1,0,1,2,3,0,1,2,1,3,2,1,0],drums:'hard',pad:.035,arpV:.032,bass:.1,ostinato:true}};
 const Music={mode:'title',want:'title',step:0,next:0,timer:0,
   start(){if(this.timer)return;this.next=AC.currentTime+.15;this.timer=setInterval(()=>this.tick(),60)},
@@ -524,7 +536,7 @@ let VW=0,VH=0,DPR=1,ZOOM=1,isTouch=false;
 isTouch=(window.matchMedia&&matchMedia('(pointer: coarse)').matches);
 function resize(){DPR=Math.min(window.devicePixelRatio||1,2);VW=innerWidth;VH=innerHeight;cv.width=VW*DPR|0;cv.height=VH*DPR|0;
   ZOOM=isTouch?clamp(Math.min(VW,VH)/470,.6,1.2):clamp(Math.min(VW,VH)/560,.7,1.35);
-  lightCv.width=Math.ceil(VW*LS);lightCv.height=Math.ceil(VH*LS);
+  lightCv.width=Math.max(1,Math.ceil(VW*LS));lightCv.height=Math.max(1,Math.ceil(VH*LS));
   const m=document.getElementById('mini');const ms=m.clientWidth||160;m.width=m.height=Math.round(ms*DPR)}
 addEventListener('resize',resize);
 
@@ -546,7 +558,11 @@ const WS=(()=>{const S=TILE;
     g.fillStyle='rgba(255,255,255,.08)';g.fillRect(0,0,S,2);
     if(v){g.fillStyle='#6a0a1a';g.beginPath();g.moveTo(8,4);g.lineTo(24,4);g.lineTo(24,32);g.lineTo(16,27);g.lineTo(8,32);g.closePath();g.fill();
       g.fillStyle='#c8a040';g.fillRect(8,4,16,2);g.beginPath();g.arc(16,15,4,0,7);g.fill();g.fillStyle='#6a0a1a';g.beginPath();g.arc(16,15,2,0,7);g.fill()}});
-  return{houseTop,houseFront:[hf(0),hf(1)],castleTop,castleFront:[cf(0),cf(1)]}})();
+  const dTop=mkCanvas(S,S,g=>{g.fillStyle='#24202a';g.fillRect(0,0,S,S);g.fillStyle='#2e2a34';for(let r=0;r<4;r++)for(let c=0;c<3;c++)g.fillRect(c*16-(r%2?8:0)+1,r*8+1,14,6);g.fillStyle='rgba(60,90,50,.25)';g.fillRect(3,5,6,3)});
+  const df=v=>mkCanvas(S,40,g=>{const gr=g.createLinearGradient(0,0,0,40);gr.addColorStop(0,'#302b38');gr.addColorStop(1,'#120f16');g.fillStyle=gr;g.fillRect(0,0,S,40);g.fillStyle='rgba(0,0,0,.4)';for(let r=0;r<6;r++){g.fillRect(0,r*7,S,1);const o=r%2?8:0;for(let k=o;k<S;k+=16)g.fillRect(k,r*7,1,7)}
+    g.fillStyle='rgba(70,110,60,.3)';g.fillRect(4,2,2,14);g.fillRect(22,0,2,9);
+    if(v){g.fillStyle='#0a080c';g.beginPath();g.moveTo(9,30);g.lineTo(9,16);g.arc(16,16,7,Math.PI,0);g.lineTo(23,30);g.fill();g.fillStyle='#d8d0c0';g.beginPath();g.arc(16,23,4,0,7);g.fill();g.fillStyle='#0a080c';g.fillRect(13.5,22,2,2);g.fillRect(16.5,22,2,2)}});
+  return{dTop,dFront:[df(0),df(1)],houseTop,houseFront:[hf(0),hf(1)],castleTop,castleFront:[cf(0),cf(1)]}})();
 const fogPuff=mkCanvas(96,96,g=>{const gr=g.createRadialGradient(48,48,0,48,48,48);gr.addColorStop(0,'rgba(8,6,14,1)');gr.addColorStop(.55,'rgba(8,6,14,.92)');gr.addColorStop(1,'rgba(8,6,14,0)');g.fillStyle=gr;g.fillRect(0,0,96,96)});
 const mistPuff=mkCanvas(96,96,g=>{const gr=g.createRadialGradient(48,48,0,48,48,48);gr.addColorStop(0,'rgba(70,64,90,.35)');gr.addColorStop(1,'rgba(70,64,90,0)');g.fillStyle=gr;g.fillRect(0,0,96,96)});
 
@@ -568,7 +584,12 @@ function drawTileC(c,t,x,y,d,tx,ty){const S=TILE;
       if(tileAt(tx-1,ty)===T.WATER){c.fillStyle='#3a2210';c.fillRect(x,y,3,S);c.fillStyle='#2a180a';c.fillRect(x,y+S-8,3,8)}if(tileAt(tx+1,ty)===T.WATER){c.fillStyle='#3a2210';c.fillRect(x+S-3,y,3,S)}break}
     case T.FOREST:c.fillStyle='#17291a';c.fillRect(x,y,S,S);c.fillStyle='#22381f';c.fillRect(x+(d%22)+2,y+((d>>2)%22)+2,4,3);c.fillStyle='#3a2a18';c.fillRect(x+((d>>1)%24)+3,y+((d>>4)%20)+6,3,2);
       sh(x+16+(d%7)-3,y+26,16,6,.4);break;
-    case T.WALL:case T.CWALL:c.fillStyle='#120e14';c.fillRect(x,y,S,S);break;
+    case T.DFLOOR:{c.fillStyle=['#1f1b24','#221e27','#1c1820'][d%3];c.fillRect(x,y,S,S);c.fillStyle='rgba(0,0,0,.3)';c.fillRect(x,y+S-1,S,1);c.fillRect(x+S-1,y,1,S);
+      if(d%9===0){c.strokeStyle='rgba(0,0,0,.45)';c.lineWidth=1;c.beginPath();c.moveTo(x+4+(d%10),y+6);c.lineTo(x+12+(d%8),y+14);c.lineTo(x+10,y+22);c.stroke()}
+      if(d%23===0){c.fillStyle='#bdb5a4';c.fillRect(x+8,y+18,10,2);c.beginPath();c.arc(x+20,y+18,3,0,7);c.fill()}
+      if(d%41===0){c.fillStyle='rgba(120,0,20,.55)';c.beginPath();c.ellipse(x+16,y+16,9,5,0,0,7);c.fill()}
+      if(d%17===0){c.fillStyle='rgba(60,100,50,.35)';c.fillRect(x+(d%20),y+((d>>3)%20),6,4)}break}
+    case T.WALL:case T.CWALL:case T.DWALL:c.fillStyle='#120e14';c.fillRect(x,y,S,S);break;
     case T.FLOOR:c.fillStyle='#4d3624';c.fillRect(x,y,S,S);c.fillStyle='#3a2819';for(let i=0;i<S;i+=8)c.fillRect(x+i,y,1,S);c.fillRect(x+((d%4)*8),y+(d%32),8,1);break;
     case T.CASTLE:castleFloor();break;
     case T.COFFIN:castleFloor();sh(x+16,y+28,11,4,.55);break;
@@ -577,8 +598,8 @@ function drawTileC(c,t,x,y,d,tx,ty){const S=TILE;
       else if(d%7===1){c.fillStyle='#3a3022';c.beginPath();c.ellipse(x+16,y+20,10,5,0,0,7);c.fill();c.fillStyle='#4a3e2c';c.beginPath();c.ellipse(x+16,y+18,9,3.5,0,0,7);c.fill();c.fillStyle='#6a5a3a';c.fillRect(x+15,y+6,2,12);c.fillRect(x+12,y+9,8,2)}break}
     case T.ROCK:grass();sh(x+17,y+21,15,6,.42);break;
   }
-  if(t!==T.WALL&&t!==T.CWALL){const up=tileAt(tx,ty-1);if(up===T.WALL||up===T.CWALL){const g=c.createLinearGradient(0,y,0,y+14);g.addColorStop(0,'rgba(0,0,0,.5)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(x,y,S,14)}
-    const lf=tileAt(tx-1,ty);if(lf===T.WALL||lf===T.CWALL){const g=c.createLinearGradient(x,0,x+8,0);g.addColorStop(0,'rgba(0,0,0,.35)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(x,y,8,S)}}}
+  if(t!==T.WALL&&t!==T.CWALL&&t!==T.DWALL){const up=tileAt(tx,ty-1);if(up===T.WALL||up===T.CWALL||up===T.DWALL){const g=c.createLinearGradient(0,y,0,y+14);g.addColorStop(0,'rgba(0,0,0,.5)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(x,y,S,14)}
+    const lf=tileAt(tx-1,ty);if(lf===T.WALL||lf===T.CWALL||lf===T.DWALL){const g=c.createLinearGradient(x,0,x+8,0);g.addColorStop(0,'rgba(0,0,0,.35)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(x,y,8,S)}}}
 function getChunk(cx,cy){const key=cy*1000+cx;let c=chunkCache.get(key);if(c){chunkCache.delete(key);chunkCache.set(key,c);return c}
   c=mkCanvas(CH*TILE,CH*TILE,g=>{for(let y=0;y<CH;y++)for(let x=0;x<CH;x++){const tx=cx*CH+x,ty=cy*CH+y;if(tx>=MW||ty>=MH){g.fillStyle='#132e4a';g.fillRect(x*TILE,y*TILE,TILE,TILE);continue}
     drawTileC(g,W.map[ty*MW+tx],x*TILE,y*TILE,W.deco[ty*MW+tx],tx,ty)}});
@@ -604,13 +625,13 @@ function isNight(){return sunLevel()<.12}
 function dmgMult(){return P.buffs.rage?1.5:1}
 
 function newGame(seed){
-  W=genWorld(seed??((Math.random()*1e9)|0));W.loot=[];autoT=120;
+  W=genWorld(seed??((Math.random()*1e9)|0));W.loot=[];inDungeon=false;dun=null;overStash=null;placeDungeonEntrances();autoT=120;
   explored=new Uint8Array(MW*MH);initMinimap();chunkCache.clear();
   const c=W.castle;
   P={x:(c.coffin.x+.5)*TILE,y:(c.coffin.y+1.6)*TILE,r:11,hp:100,maxHp:100,blood:70,maxBlood:100,lvl:1,xp:0,next:50,atk:14,speed:155,face:Math.PI/2,
     combo:0,lastAtk:-9,atkCd:0,atkAnim:0,atkAnimMax:.22,inv:0,hurt:0,mist:0,cast:0,walkT:0,moving:false,biting:null,biteTarget:null,kills:0,drained:0,
     buffs:{},cds:{bolt:0,bats:0,mist:0,nova:0},lvx:0,lvy:0,dead:false,resting:false,inSun:false,reason:'',
-    attr:{str:5,agi:5,vit:5,int:5},pts:0,gold:30,tp:0,tal:{},frenzy:0,undyingCd:0,undyT:0,npcTarget:null,bagExp:0,quests:[],mainIdx:0,visited:[],board:null,boardDay:0,bossKills:0,bag:Array(24).fill(null),eq:{weapon:null,cloak:null,ring:null,amulet:null},chestTarget:null};
+    attr:{str:5,agi:5,vit:5,int:5},pts:0,gold:30,tp:0,tal:{},frenzy:0,undyingCd:0,undyT:0,npcTarget:null,bagExp:0,dunClears:{},quests:[],mainIdx:0,visited:[],board:null,boardDay:0,bossKills:0,bag:Array(24).fill(null),eq:{weapon:null,cloak:null,ring:null,amulet:null},chestTarget:null};
   recalc();P.hp=P.maxHp;P.bag[0]=makeCons('hp',2);sel=null;selTal=null;initMerchants();ensureQuestState();
   humans=[];enemies=[];projs=[];bats=[];effects=[];parts=[];texts=[];corpses=[];
   for(const v of W.villages){const n=4+(Math.random()*3|0);for(let i=0;i<n;i++)spawnHuman(v)}
@@ -666,7 +687,7 @@ function hurtEnt(e,dmg,ang,kb,crit){if(e.dead)return;if(e.kind==='e'&&e.hp<e.max
   else{const H=HUMANS[e.type];if(e.stun>0&&!(P.biting&&P.biting.t===e))e.stun=0;if(H.fight)e.aggro=true;else{e.state='flee';e.fleeT=3;e.path=[]}}
   if(e.hp<=0)killEnt(e)}
 function killEnt(e,viaBite){if(e.dead)return;e.dead=true;
-  if(e.kind==='e'){const D=ENEMIES[e.type];P.kills++;questEvent('kill',e.type);achStat('kills');if(D.boss){achStat('boss_'+e.type);achStat('bosses')}enemyDrops(e);dropGold(e);if(TL('feast'))healP(P.maxHp*.03*TL('feast'));if(TL('frenzy'))P.frenzy=4;sfxAt({ghoul:'dGhoul',werewolf:'dWolf',alpha:'dWolf',lich:'dWraith',countess:'scream',inquis:'dHunter',templar:'dHunter',hunter:'dHunter',wraith:'dWraith'}[e.type],e.x,e.y);gainXP(Math.round(D.xp*(1+.1*(day-1))));addBlood(viaBite?0:4);
+  if(e.kind==='e'){const D=ENEMIES[e.type];P.kills++;questEvent('kill',e.type);achStat('kills');if(D.boss){achStat('boss_'+e.type);achStat('bosses')}enemyDrops(e);dropGold(e);if(TL('feast'))healP(P.maxHp*.03*TL('feast'));if(TL('frenzy'))P.frenzy=4;sfxAt({ghoul:'dGhoul',werewolf:'dWolf',alpha:'dWolf',lich:'dWraith',countess:'scream',inquis:'dHunter',templar:'dHunter',skeleton:'bones',hunter:'dHunter',wraith:'dWraith'}[e.type],e.x,e.y);gainXP(Math.round(D.xp*(1+.1*(day-1))));addBlood(viaBite?0:4);
     burst(e.x,e.y-16,e.type==='alpha'?50:16,e.type==='wraith'?'#9ec8ff':'#8a0016',e.type==='alpha'?260:170,4,.9);
     if(e.type==='wraith')smoke(e.x,e.y,8,'150,180,230');
     effects.push({type:'ring',x:e.x,y:e.y,t:0,dur:.35,R:e.r*2.6,color:'255,60,80'});
@@ -714,7 +735,7 @@ function findBiteTarget(){let best=null,bd=1e9;
   for(const e of enemies){if(e.dead||e.fade>0||ENEMIES[e.type].boss||e.type==='wraith'||e.hp>e.maxHp*.35)continue;const d=Math.hypot(e.x-P.x,e.y-P.y);if(d<48+e.r&&d<bd){bd=d;best=e}}
   return best}
 function tryBite(){if(P.dead||P.biting||!running||paused)return;
-  {const k=interactKind();if(k==='shop'){openShop(P.npcTarget);return}if(k==='quest'){openQuests(true);return}if(k==='sleep'){startSleep();return}if(k==='chest'){openChest(P.chestTarget);return}}const t=P.biteTarget||findBiteTarget();
+  {const k=interactKind();if(k==='shop'){openShop(P.npcTarget);return}if(k==='quest'){openQuests(true);return}if(k==='sleep'){startSleep();return}if(k==='obj'){useObj(P.objTarget);return}if(k==='chest'){openChest(P.chestTarget);return}}const t=P.biteTarget||findBiteTarget();
   if(!t){toast('附近沒有可吸血的目標（敵人需在 35% 血量以下）');return}
   P.biting={t,time:0,dur:t.kind==='h'?1.2:.8};t.stun=99;if(t.windup)t.windup=0;sfx('bite');P.face=Math.atan2(t.y-P.y,t.x-P.x);
   if(t.kind==='h'&&t.state!=='sleep')sfx('scream')}
@@ -737,13 +758,13 @@ function update(dt){
   if(!dawnWarned&&tod>.165&&tod<.25){dawnWarned=true;toast('⚠ 黎明將至！快躲進城堡、樹林或屋內','#ffa040')}
   updatePlayer(dt);updateHumans(dt);updateEnemies(dt);updateProjs(dt);updateBats(dt);updateEffects(dt);updateParts(dt);
   spawnManager(dt);
-  revealT-=dt;if(revealT<=0){revealT=.1;reveal(P.x,P.y,night?8:7)}
-  villageT-=dt;if(villageT<=0){villageT=25;for(const v of W.villages){const n=humans.filter(h=>h.v===v).length;
+  revealT-=dt;if(revealT<=0){revealT=.1;reveal(P.x,P.y,inDungeon?6:night?8:7)}
+  villageT-=dt;if(villageT<=0&&!inDungeon){villageT=25;for(const v of W.villages){const n=humans.filter(h=>h.v===v).length;
     if(n<4&&Math.hypot((v.x+.5)*TILE-P.x,(v.y+.5)*TILE-P.y)>520)spawnHuman(v)}}
   for(const c of corpses)c.t-=dt;corpses=corpses.filter(c=>c.t>0);
   updateRoofs(dt);updateLoot(dt);updateAmbience(dt);
   autoT-=dt;if(autoT<=0){autoT=120;saveGame('auto',true)}
-  updateQuests(dt);updateAch(dt);updateDay(dt);
+  updateQuests(dt);updateAch(dt);updateDay(dt);updateDungeon(dt);
   // 鏡頭
   const tx=P.x-VW/(2*ZOOM),ty=P.y-20-VH/(2*ZOOM);const k=1-Math.exp(-8*dt);camX+=(tx-camX)*k;camY+=(ty-camY)*k;
   shakeA*=Math.exp(-10*dt);if(shakeA<.1)shakeA=0}
@@ -781,6 +802,7 @@ function updatePlayer(dt){const p=P;if(p.dead)return;
       healP(6*dt);if(b.time>=b.dur)finishBite()}}
   p.biteTarget=p.biting?null:findBiteTarget();
   p.chestTarget=null;{let bd=46;for(const c of W.chests){if(c.open)continue;const d=Math.hypot(c.x-p.x,c.y-p.y);if(d<bd){bd=d;p.chestTarget=c}}}
+  p.objTarget=null;{let bd=48;for(const o of W.objs||[]){if(o.kind==='fount'&&o.used)continue;const d=Math.hypot(o.x-p.x,o.y-p.y);if(d<bd){bd=d;p.objTarget=o}}}
   p.npcTarget=null;{let bd=52;for(const m of W.merchants){const d=Math.hypot(m.x-p.x,m.y-p.y);if(d<bd){bd=d;p.npcTarget=m}}}
   // 飢餓
   const cTile=tileAtPx(p.x,p.y);p.resting=cTile===T.COFFIN||(cTile===T.CASTLE&&Math.hypot(p.x-(W.castle.coffin.x+.5)*TILE,p.y-(W.castle.coffin.y+.5)*TILE)<40);
@@ -841,7 +863,7 @@ function updateEnemies(dt){const night=isNight();
   for(const e of enemies){if(e.dead)continue;const D=ENEMIES[e.type],who=D.ghost?'g':e.raid?'p':'e';
     e.flash=Math.max(0,e.flash-dt);e.cd-=dt;e.lungeCd-=dt;e.alert-=dt;e.swing=Math.max(0,e.swing-dt);
     if(Math.abs(e.kx)+Math.abs(e.ky)>1){moveEnt(e,e.kx*dt,e.ky*dt,who);const k=Math.exp(-9*dt);e.kx*=k;e.ky*=k}
-    if(e.fade>0||(!night&&['werewolf','wraith','alpha','lich','countess'].includes(e.type))||(night&&e.type==='inquis')){e.fade+=dt;if(Math.random()<.4)smoke(e.x,e.y,1);
+    if(e.fade>0||(!inDungeon&&!night&&['werewolf','wraith','alpha','lich','countess'].includes(e.type))||(!inDungeon&&night&&e.type==='inquis')){e.fade+=dt;if(Math.random()<.4)smoke(e.x,e.y,1);
       if(e.fade>1.6){e.dead=true;if(D.boss){bossAlive=false;toast(`${D.name}${e.type==='inquis'?'在夜幕降臨時撤退了…':'在晨光中退去了…'}`)}}continue}
     const dx=P.x-e.x,dy=P.y-e.y,d=Math.hypot(dx,dy)||1;
     if(d>1400&&!D.boss&&!e.raid){e.dead=true;continue}
@@ -880,7 +902,7 @@ function updateEnemies(dt){const night=isNight();
     if(!P.dead&&P.mist<=0&&a.state!=='lunge'){const dx=a.x-P.x,dy=a.y-P.y,d=Math.hypot(dx,dy),m=a.r+P.r;if(d<m&&d>0)moveEnt(a,dx/d*(m-d),dy/d*(m-d),ENEMIES[a.type].ghost?'g':'e')}}
   enemies=enemies.filter(e=>!e.dead)}
 
-function spawnManager(dt){spawnT-=dt;if(spawnT>0)return;spawnT=1.6;
+function spawnManager(dt){if(inDungeon)return;spawnT-=dt;if(spawnT>0)return;spawnT=1.6;
   const night=isNight();const n=enemies.filter(e=>e.type!=='alpha').length;
   const cap=night?Math.min(5+day*2,18):Math.min(2+day,9);if(n>=cap)return;
   const shade=!night&&Math.random()<.6,pt=(shade&&findShadeSpawn(320,620))||findSpawn(560,820);if(!pt)return;
@@ -928,9 +950,9 @@ const CS=1.2;
 const SHADOW=mkCanvas(64,64,g=>{const r=g.createRadialGradient(32,32,0,32,32,32);r.addColorStop(0,'rgba(0,0,0,.6)');r.addColorStop(.55,'rgba(0,0,0,.38)');r.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=r;g.fillRect(0,0,64,64)});
 const GLOWS={};for(const[k,c]of[['p','255,40,80'],['e','255,70,40'],['h','255,200,140']])GLOWS[k]=mkCanvas(64,64,g=>{const r=g.createRadialGradient(32,32,0,32,32,32);r.addColorStop(0,`rgba(${c},.55)`);r.addColorStop(1,`rgba(${c},0)`);g.fillStyle=r;g.fillRect(0,0,64,64)});
 function rim(k,h,w,a){if(a<=.03)return;const ga=ctx.globalAlpha;ctx.globalAlpha=ga*a;ctx.drawImage(GLOWS[k],-w,-h/2-w,w*2,w*2);ctx.globalAlpha=ga}
-const EH={ghoul:32,werewolf:46,alpha:76,hunter:44,wraith:50,lich:66,countess:58,inquis:60,templar:50};
+const EH={ghoul:32,werewolf:46,alpha:76,hunter:44,wraith:50,lich:66,countess:58,inquis:60,templar:50,skeleton:40};
 const entH=e=>(e===P?42:e.kind==='h'?40:EH[e.type])*CS;
-const WALLH={[T.WALL]:26,[T.CWALL]:42};
+const WALLH={[T.WALL]:26,[T.CWALL]:42,[T.DWALL]:40};
 function shadowE(rx,ry,a=.35){const ga=ctx.globalAlpha;ctx.globalAlpha=ga*Math.min(1,a*1.9);ctx.drawImage(SHADOW,-rx*1.3,-ry*1.3,rx*2.6,ry*2.6);ctx.globalAlpha=ga}
 function circle(x,y,r,c){ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill()}
 function ell(x,y,rx,ry,c,rot=0){ctx.fillStyle=c;ctx.beginPath();ctx.ellipse(x,y,rx,ry,rot,0,7);ctx.fill()}
@@ -1070,15 +1092,15 @@ function drawProj(p){ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(
 
 // ---- 場景物件 ----
 function drawWall(tx,ty,t,alpha){const H=WALLH[t],x=tx*TILE,y=ty*TILE,d=W.deco[ty*MW+tx],S=TILE,castle=t===T.CWALL;
-  const below=tileAt(tx,ty+1),showFront=below!==T.WALL&&below!==T.CWALL,l=tileAt(tx-1,ty),r=tileAt(tx+1,ty),u=tileAt(tx,ty-1);
+  const below=tileAt(tx,ty+1),showFront=below!==T.WALL&&below!==T.CWALL&&below!==T.DWALL,l=tileAt(tx-1,ty),r=tileAt(tx+1,ty),u=tileAt(tx,ty-1);
   ctx.globalAlpha=alpha;
-  ctx.drawImage(castle?WS.castleTop:WS.houseTop,x,y-H);
+  ctx.drawImage(t===T.DWALL?WS.dTop:castle?WS.castleTop:WS.houseTop,x,y-H);
   ctx.fillStyle='rgba(0,0,0,.4)';if(l!==t)ctx.fillRect(x,y-H,1.5,S);if(r!==t)ctx.fillRect(x+S-1.5,y-H,1.5,S);if(u!==t)ctx.fillRect(x,y-H,S,1.5);
   if(castle&&u!==T.CWALL)for(let k=0;k<3;k++){const mx=x+2+k*11;ctx.fillStyle='#55466a';ctx.fillRect(mx,y-H-7,7,7);ctx.fillStyle='#2a2034';ctx.fillRect(mx,y-H-2,7,2)}
-  if(showFront){const v=castle?(d%5===0?1:0):((d%4===0&&l===T.WALL&&r===T.WALL)?1:0);ctx.drawImage((castle?WS.castleFront:WS.houseFront)[v],x,y+S-H);
+  if(showFront){const dw=t===T.DWALL,v=dw?(d%6===0?1:0):castle?(d%5===0?1:0):((d%4===0&&l===T.WALL&&r===T.WALL)?1:0);ctx.drawImage((dw?WS.dFront:castle?WS.castleFront:WS.houseFront)[v],x,y+S-H);
     if(l!==t){ctx.fillStyle='rgba(0,0,0,.3)';ctx.fillRect(x,y+S-H,2,H)}if(r!==t){ctx.fillStyle='rgba(0,0,0,.3)';ctx.fillRect(x+S-2,y+S-H,2,H)}
-    if(!castle&&v===1&&isNight()){ctx.fillStyle='rgba(255,190,90,.9)';ctx.fillRect(x+11,y+S-H+8,10,8);ctx.fillStyle='#4a3424';ctx.fillRect(x+15,y+S-H+8,2,8);ctx.fillRect(x+11,y+S-H+11,10,2)}
-    if(castle&&d%5===2){torches.push({x:x+16,y:y+S-H+12});const f=Math.sin(gameTime*20+d)*1.5;ctx.fillStyle='#3a2a1a';ctx.fillRect(x+15,y+S-H+14,2,9);ell(x+16,y+S-H+10,3+f*.3,5+f,'#ff8020');ell(x+16,y+S-H+11,1.6,2.6,'#ffe080')}}
+    if(!castle&&!dw&&v===1&&isNight()){ctx.fillStyle='rgba(255,190,90,.9)';ctx.fillRect(x+11,y+S-H+8,10,8);ctx.fillStyle='#4a3424';ctx.fillRect(x+15,y+S-H+8,2,8);ctx.fillRect(x+11,y+S-H+11,10,2)}
+    if((castle&&d%5===2)||(dw&&d%7===3)){torches.push({x:x+16,y:y+S-H+12});const f=Math.sin(gameTime*20+d)*1.5;ctx.fillStyle='#3a2a1a';ctx.fillRect(x+15,y+S-H+14,2,9);ell(x+16,y+S-H+10,3+f*.3,5+f,'#ff8020');ell(x+16,y+S-H+11,1.6,2.6,'#ffe080')}}
   ctx.globalAlpha=1}
 function drawTree(tx,ty){const d=W.deco[ty*MW+tx],x=tx*TILE+16+(d%7)-3,y=ty*TILE+26;
   ctx.globalAlpha=(Math.abs(P.x-x)<28&&P.y<y&&P.y>y-66)?.38:1;
@@ -1143,11 +1165,11 @@ function render(){
     ctx.moveTo(tx*TILE+6+ox,ty*TILE+14+(d%12));ctx.quadraticCurveTo(tx*TILE+12+ox,ty*TILE+11+(d%12),tx*TILE+18+ox,ty*TILE+14+(d%12))}ctx.stroke();
   for(const f of effects)if(f.type!=='slash')drawEffect(f);
   for(const c of corpses)if(isExplored(c.x,c.y))drawCorpse(c);
-  {const k=interactKind(),tg=k==='bite'?P.biteTarget:k==='chest'?P.chestTarget:k?P.npcTarget:null;if(tg){const pu=.5+.5*Math.sin(gameTime*6);ctx.strokeStyle=k==='bite'?`rgba(255,40,70,${.45+.45*pu})`:`rgba(255,220,100,${.45+.45*pu})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(tg.x,tg.y+(k==='chest'?6:0),16+pu*3,7+pu*1.5,0,0,7);ctx.stroke()}}
+  {const k=interactKind(),tg=k==='obj'?P.objTarget:k==='bite'?P.biteTarget:k==='chest'?P.chestTarget:k?P.npcTarget:null;if(tg){const pu=.5+.5*Math.sin(gameTime*6);ctx.strokeStyle=k==='bite'?`rgba(255,40,70,${.45+.45*pu})`:`rgba(255,220,100,${.45+.45*pu})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(tg.x,tg.y+(k==='chest'?6:0),16+pu*3,7+pu*1.5,0,0,7);ctx.stroke()}}
   // 深度排序：牆、樹、岩石、墓碑、屋頂、角色、投射物
   torches=[];const L=[];
   for(let ty=ty0;ty<=Math.min(MH-1,ty1+3);ty++)for(let tx=Math.max(0,tx0-1);tx<=Math.min(MW-1,tx1+1);tx++){const i=ty*MW+tx;if(!explored[i])continue;const t=W.map[i];
-    if(t===T.WALL||t===T.CWALL)L.push({k:(ty+1)*TILE,o:0,tx,ty,t});
+    if(t===T.WALL||t===T.CWALL||t===T.DWALL)L.push({k:(ty+1)*TILE,o:0,tx,ty,t});
     else if(t===T.FOREST)L.push({k:ty*TILE+26,o:1,tx,ty});
     else if(t===T.ROCK)L.push({k:ty*TILE+22,o:2,tx,ty});
     else if(t===T.GRAVE&&W.deco[i]%4===0)L.push({k:ty*TILE+24,o:3,tx,ty});
@@ -1155,6 +1177,7 @@ function render(){
   for(const c of W.chests)if(isExplored(c.x,c.y)&&Math.abs(c.x-P.x)<vw&&Math.abs(c.y-P.y)<vh)L.push({k:c.y+8,o:9,e:c});
   for(const l of W.loot)if(Math.abs(l.x-P.x)<vw&&Math.abs(l.y-P.y)<vh)L.push({k:l.y,o:10,e:l});
   for(const m of W.merchants)if(isExplored(m.x,m.y)&&Math.abs(m.x-P.x)<vw&&Math.abs(m.y-P.y)<vh)L.push({k:m.y,o:11,e:m});
+  for(const o of W.objs||[])if(isExplored(o.x,o.y)&&Math.abs(o.x-P.x)<vw&&Math.abs(o.y-P.y)<vh)L.push({k:o.y,o:12,e:o});
   for(const h of W.houses){if((h.x+h.w)*TILE<cX-20||h.x*TILE>cX+vw+20||(h.y+h.h)*TILE<cY||h.y*TILE-60>cY+vh)continue;if(!explored[(h.y+h.h-1)*MW+h.x+(h.w>>1)])continue;L.push({k:(h.y+h.h)*TILE+.5,o:5,h})}
   for(const h of humans)if(isExplored(h.x,h.y))L.push({k:h.y,o:6,e:h});
   for(const e of enemies)if(isExplored(e.x,e.y))L.push({k:e.y,o:6,e});
@@ -1163,7 +1186,7 @@ function render(){
   L.sort((a,b)=>a.k-b.k);
   for(const it of L){switch(it.o){
     case 0:{const H=WALLH[it.t],x=it.tx*TILE,y=it.ty*TILE;const behind=!P.dead&&P.y<it.k&&P.y>y-H&&P.y-40<y+TILE&&Math.abs(P.x-x-16)<26;drawWall(it.tx,it.ty,it.t,behind?.5:1);break}
-    case 1:drawTree(it.tx,it.ty);break;case 2:drawRock(it.tx,it.ty);break;case 3:drawTomb(it.tx,it.ty);break;case 4:drawCoffin(it.tx,it.ty);break;case 9:drawChest(it.e);break;case 10:drawLoot(it.e);break;case 11:it.e.quest?drawIgor(it.e):drawMerchant(it.e);break;
+    case 1:drawTree(it.tx,it.ty);break;case 2:drawRock(it.tx,it.ty);break;case 3:drawTomb(it.tx,it.ty);break;case 4:drawCoffin(it.tx,it.ty);break;case 9:drawChest(it.e);break;case 10:drawLoot(it.e);break;case 11:it.e.quest?drawIgor(it.e):drawMerchant(it.e);break;case 12:drawObj(it.e);break;
     case 5:drawRoof(it.h);break;
     case 6:{const e=it.e;if(e===P)drawPlayer();else if(e.kind==='h')drawHuman(e);else drawEnemy(e);break}
     case 7:drawBat(it.e);break;case 8:drawProj(it.e);break}}
@@ -1188,11 +1211,12 @@ function render(){
   if(P.biteTarget&&!P.dead&&interactKind()==='bite'){const t=P.biteTarget;const y=t.y-entH(t)-14+Math.sin(gameTime*6)*2;ctx.font='bold 12px sans-serif';const s=isTouch?'🩸 吸血':'[E] 吸血';
     ctx.strokeStyle='#000';ctx.lineWidth=3;ctx.strokeText(s,t.x,y);ctx.fillStyle='#ff6080';ctx.fillText(s,t.x,y)}
   if(interactKind()==='shop'||interactKind()==='quest'){const m=P.npcTarget,y=m.y-70+Math.sin(gameTime*6)*2;ctx.font='bold 12px sans-serif';const s=m.quest?(isTouch?'📜 對話':'[E] 對話'):(isTouch?'💰 交易':'[E] 交易');ctx.strokeStyle='#000';ctx.lineWidth=3;ctx.strokeText(s,m.x,y);ctx.fillStyle='#60f0b0';ctx.fillText(s,m.x,y)}
+  if(interactKind()==='obj'){const o=P.objTarget,y=o.y-(o.kind==='entrance'?74:52)+Math.sin(gameTime*6)*2;ctx.font='bold 12px sans-serif';const s=(isTouch?OBJ_ICON[o.kind]+' ':'[E] ')+objLabel(o);ctx.strokeStyle='#000';ctx.lineWidth=3;ctx.strokeText(s,o.x,y);ctx.fillStyle=o.kind==='entrance'?'#d0a8ff':o.kind==='fount'?'#ff7090':'#a8d8ff';ctx.fillText(s,o.x,y)}
   if(interactKind()==='sleep'){const cp=coffinPos(),y=cp.y-56+Math.sin(gameTime*6)*2;ctx.font='bold 12px sans-serif';const s=isTouch?'⚰ 沉睡至黃昏':'[E] 沉睡至黃昏';ctx.strokeStyle='#000';ctx.lineWidth=3;ctx.strokeText(s,cp.x,y);ctx.fillStyle='#c8a8ff';ctx.fillText(s,cp.x,y)}
   if(interactKind()==='chest'){const c=P.chestTarget,y=c.y-30+Math.sin(gameTime*6)*2;ctx.font='bold 12px sans-serif';const s=isTouch?'📦 開啟':'[E] 開啟寶箱';ctx.strokeStyle='#000';ctx.lineWidth=3;ctx.strokeText(s,c.x,y);ctx.fillStyle='#ffd060';ctx.fillText(s,c.x,y)}
   if(P.biting){const b=P.biting;ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(P.x-20,P.y-64,40,5);ctx.fillStyle='#e01030';ctx.fillRect(P.x-20,P.y-64,40*b.time/b.dur,5)}
   ctx.textAlign='start'}
-function drawLighting(cX,cY){const sun=sunLevel(),dark=Math.max((1-sun)*.8,(1-WEATHERS[weather].sun)*.3*sun);
+function drawLighting(cX,cY){const sun=inDungeon?0:sunLevel(),dark=inDungeon?.9:Math.max((1-sun)*.8,(1-WEATHERS[weather].sun)*.3*sun);
   const toS=(x,y)=>[(x-cX)*ZOOM*LS,(y-cY)*ZOOM*LS];
   if(dark>.02){lctx.globalCompositeOperation='source-over';lctx.clearRect(0,0,lightCv.width,lightCv.height);lctx.fillStyle=`rgba(6,3,22,${dark})`;lctx.fillRect(0,0,lightCv.width,lightCv.height);
     lctx.globalCompositeOperation='destination-out';
@@ -1222,18 +1246,18 @@ function drawMini(){const S=mini.width;if(!S)return;if(mmDirty){mmCtx.putImageDa
   const dot=(x,y,c,r)=>{const px=(x/TILE-sx)*k,py=(y/TILE-sy)*k;if(px<0||py<0||px>S||py>S)return;mctx.fillStyle=c;mctx.beginPath();mctx.arc(px,py,r*S/160,0,7);mctx.fill()};
   for(const h of humans)if(isExplored(h.x,h.y))dot(h.x,h.y,'#ffe0b0',2.2);
   for(const e of enemies)if(isExplored(e.x,e.y)&&Math.hypot(e.x-P.x,e.y-P.y)<700)dot(e.x,e.y,ENEMIES[e.type].boss?'#ff00ff':'#ff3030',ENEMIES[e.type].boss?4.5:2.6);
-  const ctr=(W.castle.cx+.5)*TILE,cty=(W.castle.cy+.5)*TILE;dot(ctr,cty,'#c070ff',4);for(const c of W.chests)if(!c.open&&isExplored(c.x,c.y))dot(c.x,c.y,'#ffd040',2.8);for(const m of W.merchants)if(isExplored(m.x,m.y))dot(m.x,m.y,m.quest?'#ffe060':'#40e0a0',3.4);for(const q of P.quests)if(q.loc&&!q.done){const px=(q.loc.x/TILE-sx)*k,py=(q.loc.y/TILE-sy)*k;if(px>4&&py>4&&px<S-4&&py<S-4){mctx.font=`${12*S/160|0}px sans-serif`;mctx.textAlign='center';mctx.textBaseline='middle';mctx.fillText('⭐',px,py)}else{const a=Math.atan2(q.loc.y-P.y,q.loc.x-P.x),R=S/2-8*S/160;mctx.fillStyle='#ffe040';mctx.beginPath();mctx.arc(S/2+Math.cos(a)*R,S/2+Math.sin(a)*R,3.6*S/160,0,7);mctx.fill()}}
+  const ctr=(W.castle.cx+.5)*TILE,cty=(W.castle.cy+.5)*TILE;dot(ctr,cty,'#c070ff',4);for(const c of W.chests)if(!c.open&&isExplored(c.x,c.y))dot(c.x,c.y,'#ffd040',2.8);for(const o of W.objs||[])if(isExplored(o.x,o.y))dot(o.x,o.y,{entrance:'#c080ff',down:'#c080ff',exit:'#60c0ff',win:'#ffd040',fount:'#ff4060'}[o.kind],3.6);for(const m of W.merchants)if(isExplored(m.x,m.y))dot(m.x,m.y,m.quest?'#ffe060':'#40e0a0',3.4);for(const q of P.quests)if(!inDungeon&&q.loc&&!q.done){const px=(q.loc.x/TILE-sx)*k,py=(q.loc.y/TILE-sy)*k;if(px>4&&py>4&&px<S-4&&py<S-4){mctx.font=`${12*S/160|0}px sans-serif`;mctx.textAlign='center';mctx.textBaseline='middle';mctx.fillText('⭐',px,py)}else{const a=Math.atan2(q.loc.y-P.y,q.loc.x-P.x),R=S/2-8*S/160;mctx.fillStyle='#ffe040';mctx.beginPath();mctx.arc(S/2+Math.cos(a)*R,S/2+Math.sin(a)*R,3.6*S/160,0,7);mctx.fill()}}
   const dn=1-sunLevel();mctx.fillStyle=`rgba(10,0,30,${dn*.35})`;mctx.fillRect(0,0,S,S);
   mctx.save();mctx.translate(S/2,S/2);mctx.rotate(P.face);mctx.fillStyle='#ff2040';mctx.strokeStyle='#fff';mctx.lineWidth=1.2*S/160;mctx.beginPath();const r=S/160;mctx.moveTo(7*r,0);mctx.lineTo(-5*r,-5*r);mctx.lineTo(-2*r,0);mctx.lineTo(-5*r,5*r);mctx.closePath();mctx.fill();mctx.stroke();mctx.restore();
   // 城堡方向指示
-  const ang=Math.atan2(cty-P.y,ctr-P.x),dist=Math.hypot(cty-P.y,ctr-P.x);if(dist>range/2*TILE){const R=S/2-7*S/160;mctx.fillStyle='#c070ff';mctx.beginPath();mctx.arc(S/2+Math.cos(ang)*R,S/2+Math.sin(ang)*R,3.5*S/160,0,7);mctx.fill()}}
+  const ang=Math.atan2(cty-P.y,ctr-P.x),dist=Math.hypot(cty-P.y,ctr-P.x);if(!inDungeon&&dist>range/2*TILE){const R=S/2-7*S/160;mctx.fillStyle='#c070ff';mctx.beginPath();mctx.arc(S/2+Math.cos(ang)*R,S/2+Math.sin(ang)*R,3.5*S/160,0,7);mctx.fill()}}
 const bigCv=document.getElementById('bigCv'),bctx=bigCv.getContext('2d');
 function openBigMap(){if(!running||P.dead)return;paused=true;document.getElementById('bigmap').classList.remove('hidden');if(mmDirty){mmCtx.putImageData(mmImg,0,0);mmDirty=false}
   const sz=Math.floor(Math.min(VW*.94,VH*.84));bigCv.style.width=bigCv.style.height=sz+'px';bigCv.width=bigCv.height=sz*DPR;const S=bigCv.width,k=S/MW;
   bctx.imageSmoothingEnabled=false;bctx.fillStyle='#000';bctx.fillRect(0,0,S,S);bctx.drawImage(mmCv,0,0,S,S);
   bctx.font=`${Math.round(13*DPR)}px sans-serif`;bctx.textAlign='center';
   const lbl=(tx,ty,txt,c)=>{if(!explored[Math.floor(ty)*MW+Math.floor(tx)])return;bctx.strokeStyle='#000';bctx.lineWidth=3*DPR;bctx.strokeText(txt,tx*k,ty*k);bctx.fillStyle=c;bctx.fillText(txt,tx*k,ty*k)};
-  lbl(W.castle.cx+.5,W.castle.cy,'🏰 城堡','#e0b0ff');for(const v of W.villages)lbl(v.x+.5,v.y,'🏠 '+v.name,'#ffe0a0');for(const g of W.graves)lbl(g.x,g.y,'⚰ 墓地','#c0c0c0');for(const c of W.chests)if(!c.open)lbl(c.x/TILE,c.y/TILE+.4,'📦','#ffd040');for(const m of W.merchants)lbl(m.x/TILE,m.y/TILE+.9,m.quest?'📜 伊戈爾':'💰 商人',m.quest?'#ffe060':'#60f0b0');for(const q of P.quests)if(q.loc&&!q.done){const t='⭐ '+q.name;bctx.strokeStyle='#000';bctx.lineWidth=3*DPR;bctx.strokeText(t,q.loc.x/TILE*k,q.loc.y/TILE*k);bctx.fillStyle='#ffe040';bctx.fillText(t,q.loc.x/TILE*k,q.loc.y/TILE*k)}
+  lbl(W.castle.cx+.5,W.castle.cy,'🏰 城堡','#e0b0ff');for(const v of W.villages)lbl(v.x+.5,v.y,'🏠 '+v.name,'#ffe0a0');for(const g of W.graves)lbl(g.x,g.y,'⚰ 墓地','#c0c0c0');for(const c of W.chests)if(!c.open)lbl(c.x/TILE,c.y/TILE+.4,'📦','#ffd040');for(const o of W.objs||[])if(o.kind==='entrance')lbl(o.x/TILE,o.y/TILE+1,DUNGEONS[o.def].icon+' '+DUNGEONS[o.def].name,'#d0a8ff');for(const m of W.merchants)lbl(m.x/TILE,m.y/TILE+.9,m.quest?'📜 伊戈爾':'💰 商人',m.quest?'#ffe060':'#60f0b0');for(const q of P.quests)if(!inDungeon&&q.loc&&!q.done){const t='⭐ '+q.name;bctx.strokeStyle='#000';bctx.lineWidth=3*DPR;bctx.strokeText(t,q.loc.x/TILE*k,q.loc.y/TILE*k);bctx.fillStyle='#ffe040';bctx.fillText(t,q.loc.x/TILE*k,q.loc.y/TILE*k)}
   bctx.fillStyle='#ff2040';bctx.beginPath();bctx.arc(P.x/TILE*k,P.y/TILE*k,5*DPR,0,7);bctx.fill();bctx.strokeStyle='#fff';bctx.lineWidth=2*DPR;bctx.stroke();
   const pct=Math.round(explored.reduce((a,b)=>a+b,0)/(MW*MH)*100);bctx.textAlign='left';bctx.fillStyle='#fff';bctx.fillText(`探索度 ${pct}%`,10*DPR,22*DPR)}
 function closeBigMap(){document.getElementById('bigmap').classList.add('hidden');paused=false}
@@ -1271,9 +1295,9 @@ function updateUI(){if(!P)return;
   SKILLS.forEach(s=>{const b=btns[s.id],locked=P.lvl<s.lvl,cd=P.cds[s.id],max=s.cd*arc*(1-P.st.cdr/100)*(s.id==='nova'&&TL('bloodmoon')?.7:1);b.classList.toggle('locked',locked);b.classList.toggle('nob',!locked&&P.blood<s.cost*arc);
     setSty(b.children[b.children.length-2],'background',cd>0?`conic-gradient(rgba(0,0,0,.72) ${cd/max*360}deg,transparent 0)`:'none');
     setTxt(b.lastChild,locked?'🔒'+s.lvl:cd>0?(cd<1?cd.toFixed(1):Math.ceil(cd)+''):'');const c=b.querySelector('.cost');if(c)setTxt(c,Math.round(s.cost*arc)+'')});
-  {const k=interactKind();btns.bite.classList.toggle('glow',!!k);setTxt(btns.bite.firstChild,k==='sleep'?'⚰️':k==='quest'?'📜':k==='shop'?'💰':k==='chest'?'📦':'🦷')}
+  {const k=interactKind();btns.bite.classList.toggle('glow',!!k);setTxt(btns.bite.firstChild,k==='obj'?OBJ_ICON[P.objTarget.kind]:k==='sleep'?'⚰️':k==='quest'?'📜':k==='shop'?'💰':k==='chest'?'📦':'🦷')}
   {const n=potCount();setTxt(btns.pot.querySelector('.cost'),n+'');btns.pot.classList.toggle('nob',n===0)}
-  setSty($('bagDot'),'display',(P.pts>0||P.tp>0)?'block':'none');updateQuestUI();
+  setSty($('bagDot'),'display',(P.pts>0||P.tp>0)?'block':'none');updateQuestUI();updateDunUI();
   let v='none',st='';
   if(P.dead)v='inset 0 0 160px rgba(120,0,0,.9)';
   else if(P.inSun){v=`inset 0 0 ${Math.round(100+30*Math.sin(gameTime*10))}px rgba(255,130,20,.65)`;st='<span style="color:#ffb040">☀ 陽光灼燒中！躲進陰影（樹林/屋內/城堡）</span>'}
@@ -1282,7 +1306,7 @@ function updateUI(){if(!P)return;
   if(!st&&P.resting&&P.hp<P.maxHp)st='<span style="color:#ff8aa0">⚰ 在棺材旁休憩，生命快速回復</span>';
   else if(!st&&P.blood<=0)st='<span style="color:#ff4060">🩸 血液枯竭！生命正在流失</span>';
   else if(!st&&!night&&sunEff()>.15&&!P.dead)st=P.buffs.holy?'<span style="color:#ffe080">☀ 聖血庇護中</span>':'<span style="color:#9c9">🌳 安全的陰影</span>';
-  else if(!st&&!night&&sunLevel()>.35&&!P.dead)st=`<span style="color:#9cc8ff">${WEATHERS[weather].i} ${WEATHERS[weather].n}：陽光微弱，可以外出活動</span>`;
+  else if(!st&&!night&&!inDungeon&&sunLevel()>.35&&!P.dead)st=`<span style="color:#9cc8ff">${WEATHERS[weather].i} ${WEATHERS[weather].n}：陽光微弱，可以外出活動</span>`;
   if(P.sleeping){st='<span style="color:#c8b8ff">⚰ 沉睡中……時間快速流逝（移動可醒來）</span>';v='inset 0 0 220px rgba(20,0,40,.85)'}
   if(raid&&raid.left>0&&!P.dead&&!st.includes('灼燒'))st=`<span style="color:#ff7070">⚔ 城堡遭到突襲！剩餘入侵者 ${raid.left}${raid.timer>0?'　⚠ 棺材正被褻瀆 '+Math.ceil(8-raid.timer)+'s':''}</span>`;
   setSty(vig,'boxShadow',v);if(ui.st!==st){ui.st=st;statusEl.innerHTML=st}
@@ -1298,6 +1322,7 @@ addEventListener('keydown',e=>{if(e.code==='F5'||e.code==='F9'){e.preventDefault
     if(e.code==='F5'){if(running&&!paused)saveGame('quick')}else if(!bagOpen&&!shopOpen)loadSlot('quick');return}
   if(!$('saveScreen').classList.contains('hidden')&&e.code==='Escape'){closeSaves();return}if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
   if(keys[e.code])return;keys[e.code]=true;if(!running)return;
+  if(dunOpen){if(['Escape','KeyE','KeyF'].includes(e.code))closeDungeonDlg();else if(e.code==='Enter'){const o=dunEnt;closeDungeonDlg();enterDungeon(o)}return}
   if(achOpen){if(['Escape','KeyK'].includes(e.code))closeAch();return}
   if(!paused&&e.code==='KeyK'){openAch();return}
   if(qOpen){if(['Escape','KeyL'].includes(e.code)||(questNpc&&['KeyE','KeyF'].includes(e.code)))closeQuests();return}
@@ -1315,7 +1340,7 @@ addEventListener('keydown',e=>{if(e.code==='F5'||e.code==='F9'){e.preventDefault
   const n={Digit1:0,Digit2:1,Digit3:2,Digit4:3,Numpad1:0,Numpad2:1,Numpad3:2,Numpad4:3,KeyR:3}[e.code];if(n!=null)useSkill(n);if(e.code==='KeyQ')quickPotion()});
 addEventListener('keyup',e=>{keys[e.code]=false;if(e.code==='Space'||e.code==='KeyJ')attackHeld=false});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false;attackHeld=false;if(running&&!P.dead&&!paused)togglePause()});
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&running&&P&&!P.dead)saveGame('auto',true);if(document.hidden&&running&&!P.dead&&!paused)togglePause()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&running&&P&&!P.dead&&!inDungeon)saveGame('auto',true);if(document.hidden&&running&&!P.dead&&!paused)togglePause()});
 cv.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;mouse.has=true});
 cv.addEventListener('mousedown',e=>{if(!running||paused)return;initAudio();if(e.button===0){attackHeld=true;playerAttack()}else if(e.button===2)useSkill(0)});
 addEventListener('mouseup',e=>{if(e.button===0)attackHeld=false});
@@ -1332,7 +1357,7 @@ mini.addEventListener('pointerdown',e=>{e.stopPropagation();openBigMap()});
 $('bigmap').addEventListener('pointerdown',closeBigMap);
 $('mapBtn').addEventListener('click',openBigMap);
 $('muteBtn').addEventListener('click',()=>{initAudio();muted=!muted;applyVol();$('muteBtn').textContent=muted?'🔇':'🔊'});
-function togglePause(){if(!running||P.dead||bagOpen||shopOpen||qOpen||achOpen)return;paused=!paused;$('pauseScreen').classList.toggle('hidden',!paused);attackHeld=false}
+function togglePause(){if(!running||P.dead||bagOpen||shopOpen||qOpen||achOpen||dunOpen)return;paused=!paused;$('pauseScreen').classList.toggle('hidden',!paused);attackHeld=false}
 $('pauseBtn').addEventListener('click',togglePause);$('resumeBtn').addEventListener('click',togglePause);
 $('restartBtn').addEventListener('click',()=>{newGame();startGame()});
 $('startBtn').addEventListener('click',startGame);
@@ -1378,7 +1403,7 @@ function rollRarity(bonus=0){const r=Math.random()*100-bonus-day*1.5;return r<2?
 function rollLoot(bonus=0,eqChance=.4){if(Math.random()<eqChance)return makeEquip(pick(Object.keys(EQB)),P.lvl+day-1,rollRarity(bonus));
   return makeCons(pickW({hp:5,blood:4,shadow:1.5,rage:1.5,tome:.35}))}
 function dropItem(item,x,y){const a=rand(0,6.28),s=rand(30,90);W.loot.push({item,x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,z:0,vz:rand(140,190),t:0})}
-function enemyDrops(e){const ch={ghoul:.22,werewolf:.3,hunter:.38,wraith:.28,templar:.35}[e.type]??1;if(Math.random()>ch)return;
+function enemyDrops(e){const ch={ghoul:.22,werewolf:.3,hunter:.38,wraith:.28,templar:.35,skeleton:.25}[e.type]??1;if(Math.random()>ch)return;
   if(ENEMIES[e.type].boss){dropItem(makeEquip(pick(Object.keys(EQB)),P.lvl+day,Math.max(3,rollRarity(30))),e.x,e.y);dropItem(rollLoot(20,1),e.x,e.y);dropItem(makeCons('tome'),e.x,e.y);return}
   dropItem(rollLoot(e.type==='hunter'?6:0),e.x,e.y)}
 function addToBag(it){if(it.kind==='cons'){const s=P.bag.find(b=>b&&b.kind==='cons'&&b.id===it.id&&b.count<20);if(s){s.count+=it.count;return true}}
@@ -1424,9 +1449,9 @@ function drawLoot(l){const it=l.item,col=it.kind==='gold'?'#ffd040':RAR[it.rar].
 let ambT=3,stepT=0,heartT=0;
 function updateAmbience(dt){if(!AC||P.dead)return;
   if(P.moving&&P.mist<=0&&!P.biting){stepT-=dt*P.speed/155*(P.buffs.noble?1.3:1);if(stepT<=0){stepT=.3;const t=tileAtPx(P.x,P.y);
-    sfx(t===T.FLOOR||t===T.BRIDGE?'stepWood':(t===T.CASTLE||t===T.COFFIN||t===T.ROAD)?'stepStone':'stepGrass')}}else stepT=.05;
+    sfx(t===T.FLOOR||t===T.BRIDGE?'stepWood':(t===T.CASTLE||t===T.COFFIN||t===T.ROAD||t===T.DFLOOR)?'stepStone':'stepGrass')}}else stepT=.05;
   if(P.hp<P.maxHp*.3){heartT-=dt;if(heartT<=0){heartT=.85;sfx('heart')}}
-  ambT-=dt;if(ambT<=0){ambT=rand(3,8);sfx(isNight()?pickW({owl:1,cricket:3,wind:1,distHowl:.4}):pickW({bird:3,wind:1,crow:1}))}}
+  ambT-=dt;if(ambT<=0){ambT=rand(3,8);sfx(inDungeon?pickW({drip:3,groan:1,wind:.4}):isNight()?pickW({owl:1,cricket:3,wind:1,distHowl:.4}):pickW({bird:3,wind:1,crow:1}))}}
 
 // ================= 背包 / 屬性 介面 =================
 let bagOpen=false,bagTab='bag',sel=null;
@@ -1575,6 +1600,7 @@ $('shopScreen').addEventListener('click',e=>{const t=e.target;if(t===$('shopScre
   renderShop()});
 $('shopClose').addEventListener('click',closeShop);
 function interactKind(){if(!P||P.dead)return null;const dd=o=>o?Math.hypot(o.x-P.x,o.y-P.y):1e9,m=P.npcTarget,c=P.chestTarget,b=P.biteTarget;
+  {const o=P.objTarget;if(o&&dd(o)<=dd(m)&&dd(o)<=dd(c)&&dd(o)<=dd(b)+10)return'obj'}
   if(m&&dd(m)<=dd(c)&&dd(m)<=dd(b)+10)return m.quest?'quest':'shop';if(c&&dd(c)<dd(b))return'chest';if(b)return'bite';return canSleep()?'sleep':null}
 function drawMerchant(m){torches.push({x:m.x-11*CS,y:m.y-12*CS});ctx.save();ctx.translate(m.x,m.y);ctx.scale(CS,CS);
   ctx.fillStyle='rgba(0,0,0,.35)';ctx.beginPath();ctx.ellipse(22,2,18,5,0,0,7);ctx.fill();
@@ -1591,7 +1617,7 @@ function drawMerchant(m){torches.push({x:m.x-11*CS,y:m.y-12*CS});ctx.save();ctx.
   ctx.restore();ctx.font='15px sans-serif';ctx.textAlign='center';ctx.fillText('💰',m.x,m.y-54+Math.sin(gameTime*2.5)*2);ctx.textAlign='start'}
 
 // ================= 存檔 / 讀檔 =================
-const SAVE_VER=1,PKEYS=['x','y','hp','blood','lvl','xp','next','kills','drained','attr','pts','tp','tal','gold','bag','eq','bagExp','buffs','cds','undyingCd','face','quests','mainIdx','visited','board','boardDay','bossKills'];
+const SAVE_VER=1,PKEYS=['x','y','hp','blood','lvl','xp','next','kills','drained','attr','pts','tp','tal','gold','bag','eq','bagExp','buffs','cds','undyingCd','face','quests','mainIdx','visited','board','boardDay','bossKills','dunClears'];
 const SAVE_SLOTS=[['auto','🔄 自動存檔'],['quick','⚡ 快速存檔（F5 / F9）'],['1','💾 存檔 1'],['2','💾 存檔 2'],['3','💾 存檔 3']];
 let autoT=120,saveConfirm=null;
 function serialize(){const bits=new Uint8Array(Math.ceil(MW*MH/8));for(let i=0;i<MW*MH;i++)if(explored[i])bits[i>>3]|=1<<(i&7);
@@ -1601,7 +1627,7 @@ function serialize(){const bits=new Uint8Array(Math.ceil(MW*MH/8));for(let i=0;i
     loot:W.loot.map(l=>({item:l.item,x:l.x,y:l.y})),p:JSON.parse(JSON.stringify(p))}}
 const saveSummary=()=>({day,lvl:P.lvl,gold:P.gold,tod,night:isNight()});
 function readSlot(s){try{return JSON.parse(localStorage.getItem('vampSave_'+s)||'null')}catch(e){return null}}
-function saveGame(slot,quiet){if(!running||!P||P.dead){if(!quiet){toast('現在無法存檔');sfx('err')}return false}
+function saveGame(slot,quiet){if(inDungeon){if(!quiet){toast('🕳 地下城中無法存檔，離開後再存');sfx('err')}return false}if(!running||!P||P.dead){if(!quiet){toast('現在無法存檔');sfx('err')}return false}
   try{localStorage.setItem('vampSave_'+slot,JSON.stringify({time:Date.now(),sum:saveSummary(),data:serialize()}))}
   catch(e){toast('⚠ 存檔失敗：瀏覽器不允許儲存資料','#ff4060');sfx('err');return false}
   if(quiet)toast('💾 已自動存檔','#555');else{toast(`💾 已存檔（第 ${day} 天・Lv.${P.lvl}）`,'#60f0b0');sfx('equip')}
@@ -1617,8 +1643,8 @@ function applySave(d){if(!d||d.v!==SAVE_VER||d.seed==null||!d.p)throw new Error(
   tod=d.tod;day=d.day;weather=WEATHERS[d.weather]?d.weather:'clear';raidAt=d.raidAt||0;raid=null;dawnWarned=!!d.dawnWarned;wasNight=isNight();bossAlive=false;
   let mx=0;const scan=it=>{if(it&&it.uid>mx)mx=it.uid};P.bag.forEach(scan);Object.values(P.eq).forEach(scan);W.merchants.forEach(m=>(m.stock||[]).forEach(s=>scan(s.item)));W.loot.forEach(l=>scan(l.item));itemUid=mx+1;
   camX=P.x-VW/(2*ZOOM);camY=P.y-20-VH/(2*ZOOM);reveal(P.x,P.y,8)}
-function startLoaded(){for(const id of ['startScreen','overScreen','pauseScreen','saveScreen','bagScreen','shopScreen','questScreen','achScreen'])$(id).classList.add('hidden');
-  bagOpen=false;shopOpen=false;qOpen=false;achOpen=false;running=true;paused=false;attackHeld=false;initAudio();sfx('lvl');
+function startLoaded(){for(const id of ['startScreen','overScreen','pauseScreen','saveScreen','bagScreen','shopScreen','questScreen','achScreen','dunScreen'])$(id).classList.add('hidden');
+  bagOpen=false;shopOpen=false;qOpen=false;achOpen=false;dunOpen=false;running=true;paused=false;attackHeld=false;initAudio();sfx('lvl');
   toast(`📂 已讀取存檔：第 ${day} 天・Lv.${P.lvl}・🪙${P.gold}`,'#60f0b0')}
 function loadSlot(s){const r=readSlot(s);if(!r){toast('這個欄位沒有存檔');sfx('err');return}
   try{applySave(r.data)}catch(e){toast('⚠ 存檔損壞，無法讀取','#ff4060');sfx('err');return}startLoaded()}
@@ -1654,10 +1680,10 @@ $('importFile').addEventListener('change',e=>{const f=e.target.files[0];e.target
 const BOSS_INTRO={alpha:'🐺 狼王的嚎叫響徹夜空……',lich:'💀 墓地傳來亡者的低語……墓穴巫妖甦醒了',countess:'🦇 血伯爵夫人降臨了這片土地……',inquis:'✝ 審判官瓦勒留斯帶著聖光而來！'};
 const PCOL={silver:'#dde8ff',dark:'#60ff80',bloodE:'#ff2040',batE:'#401020',cross:'#ffe080'};
 function spawnBoss(type,pt){const e=spawnEnemy(type,pt.x,pt.y);bossAlive=true;return e}
-function nightBoss(){if(day<2||enemies.some(e=>ENEMIES[e.type].boss&&e.type!=='inquis'))return;
+function nightBoss(){if(inDungeon||day<2||enemies.some(e=>ENEMIES[e.type].boss&&e.type!=='inquis'))return;
   const type=day===2?'alpha':day===3?'lich':day===4?'countess':pick(['alpha','lich','countess']);const pt=findSpawn(650,900);
   if(pt){spawnBoss(type,pt);setTimeout(()=>{sfx('howl');toast(BOSS_INTRO[type],'#ff4040')},1200)}}
-function dawnBoss(){if(day<3||Math.random()>.45||enemies.some(e=>e.type==='inquis'))return;const pt=findSpawn(700,950);
+function dawnBoss(){if(inDungeon||day<3||Math.random()>.45||enemies.some(e=>e.type==='inquis'))return;const pt=findSpawn(700,950);
   if(pt){spawnBoss('inquis',pt);setTimeout(()=>{sfx('bell');toast(BOSS_INTRO.inquis,'#ffe080')},1500)}}
 function enemyShot(e,a,type,spd,dmg,o={}){projs.push(Object.assign({x:e.x+Math.cos(a)*14,y:e.y+Math.sin(a)*14,vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,r:type==='cross'?9:6,dmg,owner:'e',type,life:2.5,
   src:type==='silver'?'被獵魔人的銀箭射穿':`被${ENEMIES[e.type].name}擊殺`},o))}
@@ -1751,7 +1777,7 @@ let questT=0;
 function updateQuests(dt){questT-=dt;if(questT>0)return;questT=.5;
   W.villages.forEach((v,i)=>{if(!P.visited.includes(i)&&Math.hypot((v.x+.5)*TILE-P.x,(v.y+.5)*TILE-P.y)<8*TILE){P.visited.push(i);toast(`🏠 造訪了 ${v.name}`,'#ffe0a0')}});
   refreshQ();
-  for(const q of P.quests){if(!q.boss||q.done||!q.loc||enemies.some(e=>e.type===q.boss&&!e.dead))continue;
+  for(const q of P.quests){if(inDungeon||!q.boss||q.done||!q.loc||enemies.some(e=>e.type===q.boss&&!e.dead))continue;
     if((q.boss==='inquis'?!isNight():isNight())&&Math.hypot(q.loc.x-P.x,q.loc.y-P.y)<950){spawnBoss(q.boss,q.loc);sfx('howl');toast('⚠ '+BOSS_INTRO[q.boss],'#ff4040')}}}
 function claimQuest(id){const i=P.quests.findIndex(q=>q.id===id),q=P.quests[i];if(!q||!q.done)return;P.quests.splice(i,1);
   const r=q.rew,got=[];P.gold+=r.gold||0;achStat('goldEarned',r.gold||0);
@@ -1846,7 +1872,10 @@ const ACH=[
   {id:'buy',c:'財富',i:'🛒',n:'商人的老主顧',d:'向商人購買 20 次',s:'buys',g:20,p:10},
   {id:'bty',c:'任務',i:'📋',n:'賞金獵人',d:'完成 10 個懸賞',s:'bounties',g:10,p:15},
   {id:'main',c:'任務',i:'🏰',n:'王座歸來',d:'完成全部 8 章主線劇情',r:runV(()=>P.mainIdx),g:8,p:40},
-  {id:'raid3',c:'生存',i:'🛡️',n:'城堡守護者',d:'擊退 3 次獵魔人突襲',s:'raids',g:3,p:15}];
+  {id:'raid3',c:'生存',i:'🛡️',n:'城堡守護者',d:'擊退 3 次獵魔人突襲',s:'raids',g:3,p:15},
+  {id:'dun1',c:'探索',i:'🕳️',n:'初探地城',d:'攻略任一地下城',s:'dungeons',g:1,p:10},
+  {id:'dun10',c:'探索',i:'🗝️',n:'地城老手',d:'累計攻略 10 次地下城',s:'dungeons',g:10,p:25},
+  {id:'dunAll',c:'探索',i:'🌀',n:'深淵行者',d:'攻略全部 4 座地下城',r:()=>Object.keys(DUNGEONS).filter(k=>(PROF.st['dun_'+k]||0)>0).length,g:4,p:40}];
 let PROF={ach:{},st:{}};try{const p=JSON.parse(localStorage.getItem('vampProfile')||'null');if(p)PROF={ach:p.ach||{},st:p.st||{}}}catch(e){}
 let profDirty=false,profT=1,exploredN=0,achOpen=false,achPrev=null,achShowing=false;const achQ=[];
 function saveProf(){try{localStorage.setItem('vampProfile',JSON.stringify(PROF))}catch(e){}profDirty=false}
@@ -1882,7 +1911,7 @@ $('achStartBtn').addEventListener('click',openAch);$('achPauseBtn').addEventList
 const WEATHERS={clear:{n:'晴朗',i:'☀️',sun:1,d:'陽光猛烈，躲在陰影裡'},cloudy:{n:'多雲',i:'⛅',sun:.5,d:'陽光減弱，灼燒減半'},
   rain:{n:'陰雨',i:'🌧️',sun:.14,d:'烏雲遮蔽陽光，可以外出活動'},fog:{n:'濃霧',i:'🌫️',sun:.08,d:'濃霧遮蔽陽光，可以自由行動！'}};
 let weather='clear',raidAt=0,raid=null,forestT=8;
-const sunEff=()=>sunLevel()*WEATHERS[weather].sun;
+const sunEff=()=>inDungeon?0:sunLevel()*WEATHERS[weather].sun;
 function rollWeather(){weather=day<=1?'clear':pickW({clear:4,cloudy:3,rain:2,fog:1});const W_=WEATHERS[weather];
   setTimeout(()=>running&&toast(`${W_.i} 今日天氣：${W_.n}——${W_.d}`,'#9cc8ff'),3500)}
 // ---- 棺材沉睡 ----
@@ -1908,17 +1937,17 @@ function startRaid(){const c=W.castle,n=3+Math.min(4,day-1),list=[];
   if(P.sleeping)wakeUp('⚠ 你被入侵者驚醒了！')}
 function updateDay(dt){
   if(P.sleeping){if(isNight())wakeUp('🌙 你在黃昏時分甦醒，力量充盈');else{healP(25*dt);if(Math.random()<dt*2)floatText(P.x+rand(-8,8),P.y-30,'z','#c8b8ff',12)}}
-  if(!isNight()&&raidAt&&tod>=raidAt){raidAt=0;startRaid()}
+  if(!inDungeon&&!isNight()&&raidAt&&tod>=raidAt){raidAt=0;startRaid()}
   if(raid){raid.left=raid.list.filter(e=>!e.dead).length;
     const cp=coffinPos();if(raid.list.some(e=>!e.dead&&!e.fade&&Math.hypot(e.x-cp.x,e.y-cp.y)<46)){raid.timer+=dt;if(Math.random()<dt*3)smoke(cp.x,cp.y-10,1,'200,180,120')}
     if(raid.timer>8){const lost=Math.floor(P.gold*.25);P.gold-=lost;toast(`💔 棺材遭到褻瀆！入侵者搶走了 ${lost} 金幣`,'#ff4040');sfx('err');for(const e of raid.list)if(!e.dead)e.fade=.01;raid=null}
     else if(raid.left===0){const g=60+day*25;P.gold+=g;achStat('goldEarned',g);gainXP(40+day*15);dropItem(makeEquip(pick(Object.keys(EQB)),P.lvl+day,Math.max(2,rollRarity(10))),cp.x,cp.y+20);
       toast(`🛡 擊退了突襲！獲得 🪙${g} 與戰利品`,'#ffd040');sfx('questClaim');achStat('raids');raid=null}
     else if(isNight()){for(const e of raid.list)if(!e.dead)e.fade=.01;toast('入侵者在夜幕降臨前撤退了');raid=null}}
-  forestT-=dt;if(forestT<=0){forestT=18;if(!isNight())spawnWoodcutters()}
+  forestT-=dt;if(forestT<=0){forestT=18;if(!isNight()&&!inDungeon)spawnWoodcutters()}
   for(const h of humans)if(h.forest&&!h.dead&&Math.hypot(h.x-P.x,h.y-P.y)>1400)h.dead=true;
-  if(weather==='rain'&&!isNight()&&AC&&Math.random()<dt*.5)sfx('rain')}
-function drawWeather(){if(isNight()||weather==='clear')return;const s=sunLevel();if(s<.05)return;
+  if(weather==='rain'&&!inDungeon&&!isNight()&&AC&&Math.random()<dt*.5)sfx('rain')}
+function drawWeather(){if(inDungeon||isNight()||weather==='clear')return;const s=sunLevel();if(s<.05)return;
   if(weather==='rain'){ctx.strokeStyle='rgba(170,190,230,.35)';ctx.lineWidth=1;ctx.beginPath();
     for(let i=0;i<90;i++){const x=((i*137.5+gameTime*90)%(VW+60))-30,y=((i*71.3+gameTime*620)%(VH+40))-20;ctx.moveTo(x,y);ctx.lineTo(x-4,y+14)}ctx.stroke()}
   if(weather==='fog'){ctx.fillStyle=`rgba(170,170,190,${.16*s})`;ctx.fillRect(0,0,VW,VH);
@@ -1933,6 +1962,123 @@ document.addEventListener('touchmove',e=>{if(e.touches.length>1)e.preventDefault
 
 BOSSDRAW.templar=(e,mv,dir,w,atk)=>{ctx.scale(.8,.8);BOSSDRAW.inquis(e,mv,dir,w,atk)};
 
+// ================= 地下城副本 =================
+const GAME_VER='1.2.0';
+const DUNGEONS={
+  crypt:{name:'墓穴迷宮',icon:'⚰️',lvl:3,desc:'墓地之下的古老墓穴，食屍鬼與骷髏在黑暗中遊蕩。',mobs:{ghoul:3,skeleton:3,wraith:2},boss:'lich',bossName:'墓穴之主（巫妖）',col:'#7fdc8a'},
+  den:{name:'狼人巢穴',icon:'🐺',lvl:6,desc:'森林深處的地下洞窟，狼群在此繁衍，狼王坐鎮最深處。',mobs:{werewolf:4,ghoul:1,skeleton:1},boss:'alpha',bossName:'巢穴狼王',col:'#d8a060'},
+  vault:{name:'聖堂地窖',icon:'✝️',lvl:9,desc:'教會藏在地底的秘密據點，聖殿騎士與獵魔人在此集結。',mobs:{templar:3,hunter:2,skeleton:1},boss:'inquis',bossName:'地窖審判官',col:'#ffe080'},
+  temple:{name:'血之神殿',icon:'🩸',lvl:12,desc:'遠古吸血鬼的神殿。血伯爵夫人在最深處等待挑戰者。',mobs:{wraith:2,werewolf:2,templar:2,skeleton:2},boss:'countess',bossName:'神殿之主（血伯爵夫人）',col:'#ff4060'}};
+const DCASTLE={cx:-999,cy:-999,x0:-999,y0:-999,w:1,h:1,coffin:{x:-999,y:-999},door:{x:-999,y:-999}};
+let inDungeon=false,dun=null,overStash=null,dunOpen=false,dunEnt=null;
+function placeDungeonEntrances(){const r=mulberry32((W.seed^0x5bd1e995)>>>0),list=[];
+  const want=[['crypt','grave'],['den','forest'],['vault','village'],['temple','far']];
+  for(const[def,near]of want){let pt=null;
+    for(let i=0;i<900&&!pt;i++){let tx,ty;
+      if(near==='grave'&&W.graves.length){const g=W.graves[0];tx=Math.floor(g.x)+Math.round(r()*10-5);ty=Math.floor(g.y)+Math.round(r()*8-4)}
+      else if(near==='village'&&W.villages.length){const v=W.villages[Math.floor(r()*W.villages.length)];tx=v.x+Math.round(r()*24-12);ty=v.y+Math.round(r()*24-12)}
+      else{tx=8+Math.floor(r()*(MW-16));ty=8+Math.floor(r()*(MH-16))}
+      const t=tileAt(tx,ty),dc=Math.hypot(tx-W.castle.cx,ty-W.castle.cy);
+      const ok=near==='forest'?t===T.FOREST:near==='grave'?(t===T.GRAVE||t===T.GRASS):(t===T.GRASS||t===T.ROAD);
+      if(!ok||dc<18||(near==='far'&&dc<45))continue;
+      if([[0,1],[1,0],[-1,0],[0,-1]].some(([a,b])=>SOLID[tileAt(tx+a,ty+b)]||tileAt(tx+a,ty+b)===T.FLOOR))continue;
+      if(near==='village'&&W.villages.some(v=>Math.hypot(v.x-tx,v.y-ty)<8))continue;
+      if(list.some(e=>Math.hypot(e.tx-tx,e.ty-ty)<15)||W.chests.some(c=>Math.abs(c.tx-tx)<2&&Math.abs(c.ty-ty)<2))continue;
+      pt={tx,ty}}
+    if(pt)list.push({kind:'entrance',def,tx:pt.tx,ty:pt.ty,x:(pt.tx+.5)*TILE,y:(pt.ty+.5)*TILE})}
+  W.objs=list}
+function genDungeon(seed,floor,key){const D=DUNGEONS[key],rng=mulberry32(seed>>>0),map=new Uint8Array(MW*MH).fill(T.DWALL),deco=new Uint8Array(MW*MH);
+  for(let i=0;i<deco.length;i++)deco[i]=rng()*256|0;
+  const X0=40,Y0=40,SZ=70,rooms=[];
+  for(let t=0;t<500&&rooms.length<11;t++){const w=7+(rng()*7|0),h=6+(rng()*6|0),x=X0+(rng()*(SZ-w)|0),y=Y0+(rng()*(SZ-h)|0);
+    if(rooms.some(q=>x<q.x+q.w+3&&x+w+3>q.x&&y<q.y+q.h+3&&y+h+3>q.y))continue;rooms.push({x,y,w,h,cx:x+(w>>1),cy:y+(h>>1)})}
+  const carve=(x,y)=>{if(x>0&&y>0&&x<MW-1&&y<MH-1)map[y*MW+x]=T.DFLOOR};
+  for(const q of rooms)for(let y=q.y;y<q.y+q.h;y++)for(let x=q.x;x<q.x+q.w;x++)carve(x,y);
+  const corridor=(a,b)=>{let x=a.cx,y=a.cy;const hf=rng()<.5;
+    while(x!==b.cx||y!==b.cy){carve(x,y);carve(x+1,y);carve(x,y+1);carve(x+1,y+1);
+      if(hf?x!==b.cx:y===b.cy)x+=Math.sign(b.cx-x);else y+=Math.sign(b.cy-y)}carve(x,y)};
+  const chain=[rooms[0]],left=rooms.slice(1);
+  while(left.length){const last=chain[chain.length-1];let bi=0,bd=1e9;left.forEach((q,i)=>{const d=Math.hypot(q.cx-last.cx,q.cy-last.cy);if(d<bd){bd=d;bi=i}});const nx=left.splice(bi,1)[0];corridor(last,nx);chain.push(nx)}
+  for(let k=0;k<2&&chain.length>4;k++){const a=chain[rng()*chain.length|0],b=chain[rng()*chain.length|0];if(a!==b)corridor(a,b)}
+  const start=chain[0];let end=chain[chain.length-1],ed=0;for(const q of chain){const d=Math.hypot(q.cx-start.cx,q.cy-start.cy);if(d>ed){ed=d;end=q}}
+  const px=t=>(t+.5)*TILE,objs=[{kind:'exit',x:px(start.cx),y:px(start.cy-1)}],chests=[],spawns=[];
+  if(floor<3)objs.push({kind:'down',x:px(end.cx),y:px(end.cy)});
+  const mids=chain.filter(q=>q!==start&&q!==end);
+  if(mids.length&&rng()<.7){const q=mids[rng()*mids.length|0];objs.push({kind:'fount',x:px(q.x+1),y:px(q.y+1),used:false})}
+  for(let k=0;k<1+(rng()<.6?1:0)&&mids.length;k++){const q=mids[rng()*mids.length|0];const c={tx:q.x+q.w-2,ty:q.y+1,tier:2,open:false};c.x=px(c.tx);c.y=px(c.ty);if(!chests.some(o=>o.tx===c.tx&&o.ty===c.ty))chests.push(c)}
+  for(const q of chain){if(q===start)continue;const n=q===end&&floor===3?1:1+(rng()*3|0)+(floor>1?1:0);
+    for(let k=0;k<n;k++)spawns.push({type:pickW(D.mobs),x:px(q.x+1+(rng()*(q.w-2)|0)),y:px(q.y+1+(rng()*(q.h-2)|0))})}
+  return{map,deco,villages:[],houses:[],graves:[],castle:DCASTLE,chests,merchants:[],loot:[],objs,seed,spawns,dungeon:true,
+    startPt:{x:px(start.cx),y:px(start.cy+1)},bossPt:floor===3?{x:px(end.cx),y:px(end.cy)}:null}}
+function loadFloor(f){dun.floor=f;dun.won=false;
+  enemies=[];projs=[];bats=[];effects=[];corpses=[];parts=[];texts=[];humans=[];
+  W=genDungeon(dun.seed+f*7919,f,dun.key);explored=new Uint8Array(MW*MH);initMinimap();chunkCache.clear();inDungeon=true;
+  P.x=W.startPt.x;P.y=W.startPt.y;P.lvx=P.lvy=0;camX=P.x-VW/(2*ZOOM);camY=P.y-20-VH/(2*ZOOM);reveal(P.x,P.y,6);
+  const D=DUNGEONS[dun.key],sc=1+.12*(f-1)+.04*D.lvl;
+  for(const s of W.spawns){const e=spawnEnemy(s.type,s.x,s.y);e.hp=e.maxHp=e.maxHp*sc;e.dmg*=sc}
+  if(W.bossPt){const b=spawnBoss(D.boss,W.bossPt);b.hp=b.maxHp=b.maxHp*sc*1.25;b.dmg*=sc;W.boss=b}
+  sfx('summon');toast(`${D.icon} ${D.name}　第 ${f} / 3 層${f===3?'　——最終層，頭目就在深處':''}`,D.col)}
+function enterDungeon(o){if(raid&&raid.left>0){toast('⚔ 城堡正在遭到突襲，先擊退入侵者！','#ff4040');sfx('err');return}
+  overStash={W,explored,mmCv,mmCtx,mmImg,exploredN,humans,x:o.x,y:o.y+36};P.sleeping=false;
+  dun={key:o.def,seed:(Math.random()*1e9)|0,floor:1,won:false};loadFloor(1);sfx('mist');shake(4)}
+function exitDungeon(msg){const s=overStash;if(!s)return;
+  W=s.W;explored=s.explored;mmCv=s.mmCv;mmCtx=s.mmCtx;mmImg=s.mmImg;exploredN=s.exploredN;humans=s.humans;
+  enemies=[];projs=[];bats=[];effects=[];corpses=[];parts=[];texts=[];chunkCache.clear();mmDirty=true;
+  inDungeon=false;dun=null;overStash=null;bossAlive=false;spawnT=4;P.x=s.x;P.y=s.y;camX=P.x-VW/(2*ZOOM);camY=P.y-20-VH/(2*ZOOM);
+  sfx('mist');toast(msg||'你回到了地面',isNight()?'#8060ff':'#ffb040');if(!isNight()&&sunEff()>.15)setTimeout(()=>toast('☀ 現在是白天！小心陽光','#ffa040'),1200)}
+function updateDungeon(dt){if(!inDungeon||!dun)return;
+  if(dun.floor===3&&W.boss&&W.boss.dead&&!dun.won){dun.won=true;const D=DUNGEONS[dun.key],bp=W.bossPt,first=P.dunClears[dun.key]!==day;
+    W.objs.push({kind:'win',x:bp.x,y:bp.y+40});achStat('dungeons');achStat('dun_'+dun.key);
+    if(first){P.dunClears[dun.key]=day;const g=Math.round((150+P.lvl*30)*(1+D.lvl*.05));P.gold+=g;achStat('goldEarned',g);gainXP(120+D.lvl*25);
+      dropItem(makeEquip(pick(Object.keys(EQB)),P.lvl+day+2,Math.max(3,rollRarity(25))),bp.x,bp.y);if(Math.random()<.5)dropItem(makeCons('tome'),bp.x,bp.y);
+      toast(`🏆 攻略「${D.name}」！獲得 🪙${g}、史詩以上裝備`,'#ffd040')}
+    else toast(`🏆 再次攻略「${D.name}」！（今日通關獎勵已領取）`,'#ffd040');
+    sfx('questClaim');setTimeout(()=>toast('✨ 返回地面的傳送門出現了'),1500)}}
+function updateDunUI(){const el=$('dunTag');el.classList.toggle('hidden',!inDungeon);
+  if(inDungeon&&dun){const D=DUNGEONS[dun.key];setTxt(el,`${D.icon} ${D.name}・第 ${dun.floor}/3 層・敵人 ${enemies.filter(e=>!e.dead).length}`)}}
+const OBJ_ICON={entrance:'🕳️',down:'⬇️',exit:'🚪',win:'✨',fount:'🩸'};
+function objLabel(o){return o.kind==='entrance'?`進入：${DUNGEONS[o.def].name}`:o.kind==='down'?'前往下一層':o.kind==='exit'?(P.exitConfirm>gameTime?'再按一次確定離開':'離開地下城'):o.kind==='win'?'返回地面':'飲用血池'}
+function useObj(o){if(!o)return;
+  if(o.kind==='entrance')openDungeon(o);
+  else if(o.kind==='down'){loadFloor(dun.floor+1);sfx('mist')}
+  else if(o.kind==='exit'){if(P.exitConfirm>gameTime)exitDungeon('你離開了地下城（進度未保留）');else{P.exitConfirm=gameTime+3;toast('🚪 再按一次離開地下城（目前進度不會保留）')}}
+  else if(o.kind==='win')exitDungeon(`🏆 你帶著戰利品回到了地面`);
+  else if(o.kind==='fount'&&!o.used){o.used=true;addBlood(70);healP(P.maxHp*.3);sfx('drink');burst(o.x,o.y-14,24,'#d00020',150,3,.7);toast('🩸 你飲下了血池中的鮮血 +70 血液')}}
+function openDungeon(o){if(!running||P.dead)return;dunOpen=true;dunEnt=o;paused=true;attackHeld=false;const D=DUNGEONS[o.def],cleared=P.dunClears[o.def]===day;
+  $('dunBody').innerHTML=`<div class="dhead" style="color:${D.col}"><span>${D.icon}</span>${D.name}</div><div class="qd">${D.desc}</div>
+  <div class="dgrid"><div>建議等級<b>Lv.${D.lvl}+</b></div><div>層數<b>3 層</b></div><div>最終頭目<b>${D.bossName}</b></div><div>你的等級<b style="color:${P.lvl>=D.lvl?'#7f7':'#f77'}">Lv.${P.lvl}</b></div></div>
+  <div class="qr">首次通關（每天一次）：🪙 大量金幣・✨ 經驗・史詩以上裝備・50% 血之典籍</div>
+  <div class="qd">${cleared?'⚠ 今天已經攻略過，再次挑戰只有一般掉落（黎明重置）':'地底沒有陽光，白天也能挑戰。'}地下城中無法存檔；每層入口的 🚪 可隨時離開（進度不保留）。</div>
+  <div class="ibtns"><button class="btn" id="dunGo">進入地下城</button><button class="btn sec" id="dunCancel">取消</button></div>`;
+  $('dunScreen').classList.remove('hidden');sfx('greet')}
+function closeDungeonDlg(){if(!dunOpen)return;dunOpen=false;paused=false;$('dunScreen').classList.add('hidden')}
+$('dunScreen').addEventListener('click',e=>{const t=e.target;if(t===$('dunScreen')||t.id==='dunCancel'){closeDungeonDlg();return}
+  if(t.id==='dunGo'){const o=dunEnt;closeDungeonDlg();enterDungeon(o)}});
+function drawObj(o){const k=o.kind;if(k!=='fount'||!o.used)torches.push({x:o.x,y:o.y-14});ctx.save();ctx.translate(o.x,o.y);
+  if(k==='entrance'){const D=DUNGEONS[o.def],pu=.5+.5*Math.sin(gameTime*3);shadowE(26,8,.4);
+    ctx.fillStyle='#3d3844';ctx.fillRect(-22,-36,44,36);ctx.fillStyle='#4c4654';ctx.fillRect(-22,-36,44,4);ctx.fillStyle='#2a2630';ctx.fillRect(-22,-4,44,4);
+    poly('#2c2832',[-27,-36,27,-36,0,-54]);poly('#3a3540',[-21,-38,21,-38,0,-50]);
+    ctx.fillStyle='#08060c';ctx.beginPath();ctx.moveTo(-12,0);ctx.lineTo(-12,-18);ctx.arc(0,-18,12,Math.PI,0);ctx.lineTo(12,0);ctx.fill();
+    const g=ctx.createRadialGradient(0,-10,1,0,-10,16);g.addColorStop(0,`rgba(180,90,255,${.35+.3*pu})`);g.addColorStop(1,'rgba(120,40,200,0)');ctx.fillStyle=g;ctx.fillRect(-14,-30,28,30);
+    ctx.fillStyle='#55505e';for(let i=0;i<3;i++)ctx.fillRect(-10+i*1.5,-3-i*4,20-i*3,1.6);
+    ctx.font='14px sans-serif';ctx.textAlign='center';ctx.fillText(D.icon,0,-58+Math.sin(gameTime*2)*2)}
+  else if(k==='down'){shadowE(20,8,.5);ell(0,0,18,9,'#06040a');ctx.fillStyle='#3a3442';for(let i=0;i<4;i++)ctx.fillRect(-14+i*2,-4+i*2.4,28-i*4,1.6);
+    const pu=.5+.5*Math.sin(gameTime*4);ctx.strokeStyle=`rgba(190,120,255,${.5+.4*pu})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,0,20,10,0,0,7);ctx.stroke()}
+  else if(k==='exit'||k==='win'){const c=k==='win'?'255,210,90':'110,190,255';ctx.translate(0,-18);
+    for(let i=0;i<3;i++){ctx.strokeStyle=`rgba(${c},${.75-i*.2})`;ctx.lineWidth=3-i*.7;ctx.beginPath();ctx.ellipse(0,0,14+i*3,22+i*3,0,gameTime*(2+i)+i,gameTime*(2+i)+i+Math.PI*1.4);ctx.stroke()}
+    const g=ctx.createRadialGradient(0,0,1,0,0,18);g.addColorStop(0,`rgba(${c},.55)`);g.addColorStop(1,`rgba(${c},0)`);ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(0,0,14,22,0,0,7);ctx.fill()}
+  else if(k==='fount'){shadowE(16,6,.4);ctx.fillStyle='#4a4450';ctx.fillRect(-14,-14,28,14);ell(0,-14,15,6,'#5a5460');ell(0,-14,11,4,o.used?'#1a1418':'#a00018');
+    if(!o.used){ctx.fillStyle=`rgba(255,60,80,${.4+.3*Math.sin(gameTime*5)})`;ctx.beginPath();ctx.ellipse(-3,-15,4,1.4,0,0,7);ctx.fill()}}
+  ctx.restore()}
+// 骷髏戰士
+BOSSDRAW.skeleton=(e,mv,dir,w,atk)=>{shadowE(10,4);ctx.scale(dir,1);const b=mv?-Math.abs(Math.cos(e.walkT*12)):0,bone='#ddd8c8',dk='#8a8478';
+  limb(-2,-12,-2+w*3,0,2,bone);limb(2,-12,2-w*3,0,2,bone);
+  ctx.strokeStyle=bone;ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(0,-26+b);ctx.lineTo(0,-12+b);for(let k=0;k<3;k++){ctx.moveTo(-5,-23+k*3.5+b);ctx.quadraticCurveTo(0,-21+k*3.5+b,5,-23+k*3.5+b)}ctx.stroke();
+  ell(0,-12+b,5,2,dk);limb(-1,-24+b,-5,-16+b,2,bone);ell(-6,-17+b,4.5,6,'#5a4a3a');ctx.fillStyle='#8a7a5a';ctx.fillRect(-7,-18+b,2,2);
+  circle(1,-30+b,5.5,bone);ell(3,-30.5+b,1.4,1.7,'#111');ctx.fillStyle='#222';ctx.fillRect(1.5,-27+b,3.5,1);if(atk)circle(3,-30.5+b,.8,'#f44');
+  const s=e.swing>0,wu=e.windup>0,hx=s?11:wu?2:5,hy=(s?-18:wu?-30:-15)+b,ang=s?-.2:wu?-2:-1.1;limb(1,-24+b,hx,hy,2,bone);limb(hx,hy,hx+Math.cos(ang)*14,hy+Math.sin(ang)*14,2,'#b8bcc4')};
+$('verTag').textContent='V'+GAME_VER;$('verPause').textContent='V'+GAME_VER;
+
 // ================= 啟動 =================
 try{const b=JSON.parse(localStorage.getItem('vampBest')||'{}');if(b.score)$('best').textContent=`最佳紀錄：第 ${b.day} 天・擊殺 ${b.kills}・Lv.${b.lvl}・${b.score} 分`}catch(e){}
 if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)){
@@ -1945,7 +2091,7 @@ let last=performance.now(),frameN=0;
 function frame(now){requestAnimationFrame(frame);let dt=(now-last)/1000;last=now;if(dt>.05)dt=.05;
   if(running&&!paused)update(dt);else if(!running&&P&&!P.dead){gameTime+=dt;updateParts(dt)}
   if(running&&P.dead){updateParts(dt);updateEffects(dt)}
-  if(AC)Music.want=(!running||P.dead)?'title':enemies.some(e=>ENEMIES[e.type].boss&&!e.fade&&Math.hypot(e.x-P.x,e.y-P.y)<850)?'boss':isNight()?'night':'day';
+  if(AC)Music.want=(!running||P.dead)?'title':enemies.some(e=>ENEMIES[e.type].boss&&!e.fade&&Math.hypot(e.x-P.x,e.y-P.y)<850)?'boss':inDungeon?'dungeon':isNight()?'night':'day';
   render();updateUI();if((frameN++&1)===0)drawMini()}
 requestAnimationFrame(frame);
 </script>
