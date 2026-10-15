@@ -193,7 +193,7 @@ html,body{-webkit-touch-callout:none;-webkit-text-size-adjust:100%;text-size-adj
     <div class="help">
       <div><b>🎮 電腦操作</b><br><kbd>WASD</kbd>/方向鍵 移動<br>滑鼠 瞄準・<kbd>左鍵</kbd>/<kbd>空白</kbd> 攻擊<br><kbd>E</kbd> 吸血/開寶箱・<kbd>Q</kbd> 血瓶<br><kbd>1</kbd>~<kbd>4</kbd> 技能（右鍵 = 血矢）<br><kbd>B</kbd> 背包・<kbd>C</kbd> 屬性・<kbd>T</kbd> 天賦・<kbd>L</kbd> 任務・<kbd>K</kbd> 成就<br><kbd>F5</kbd>/<kbd>F9</kbd> 快速存/讀檔・<kbd>M</kbd> 地圖・<kbd>P</kbd> 暫停</div>
       <div><b>📱 手機操作</b><br>左半螢幕拖曳 = 虛擬搖桿<br>右下按鈕：攻擊 / 吸血 / 技能 / 血瓶<br>右上 📜 任務・🎒 背包與屬性<br>攻擊自動瞄準最近的敵人<br>點小地圖開大地圖</div>
-      <div><b>☀ 日夜輪替</b><br>白天陽光會灼燒你！躲進<b>樹林</b>、<b>房屋</b>或<b>城堡</b>的陰影。白天森林裡有<b>樵夫</b>可吸血；<b>陰雨／濃霧</b>天可外出；在<b>棺材</b>旁可沉睡至黃昏；小心獵魔人<b>突襲城堡</b>。地圖上的 🕳 <b>地下城</b>沒有陽光，白天也能挑戰！城堡旁的 🗼 <b>奧天塔</b>可無限向上挑戰。</div>
+      <div><b>☀ 日夜輪替</b><br>白天陽光會灼燒你！躲進<b>樹林</b>、<b>房屋</b>或<b>城堡</b>的陰影。白天森林裡有<b>樵夫</b>可吸血；<b>陰雨／濃霧</b>天可外出；在<b>棺材</b>旁可沉睡至黃昏；小心獵魔人<b>突襲城堡</b>。地圖上的 🕳 <b>地下城</b>沒有陽光，白天也能挑戰！城堡旁的 🗼 <b>奧天塔</b>可無限向上挑戰。地下城與奧天塔可取得 🔮 <b>神器</b>，裝備後獲得被動技能。</div>
       <div><b>🩸 吸血</b><br>靠近人類按吸血：回復生命與血液。<br>騎士→狂暴　神父→抗陽<br>法師→奧術　貴族→疾行吸血<br>血液會隨時間流失，別讓它見底。</div>
     </div>
     <div style="font-size:12px;color:#a88">地圖被迷霧籠罩，走過才會揭開。擊敗怪物與開啟 📦 寶箱可獲得金幣、裝備與藥水，到城堡或村莊的 💰 商人交易；升級獲得屬性點與天賦點。棺材可快速回復生命。每夜都更危險…</div>
@@ -501,6 +501,12 @@ function sfx(n){if(!AC)return;const now=performance.now();if(lastS[n]&&now-lastS
     case'bones':for(let i=0;i<5;i++)tone(700+Math.random()*900,.05,'square',.03,300,i*.045);noise(.2,.06,2500,2);break;
     case'drip':tone(1800,.08,'sine',.04,900);tone(1300,.1,'sine',.02,650,.06);break;
     case'groan':tone(85,1.4,'sawtooth',.03,55);noise(1.2,.03,300,1);break;
+    case'throw':noise(.08,.06,4000,3,0,1500);break;
+    case'frost':noise(.5,.12,5000,1,0,1200);tone(1200,.4,'sine',.04,600);break;
+    case'zap':noise(.18,.14,3000,1.5);tone(1800,.15,'square',.04,300);break;
+    case'meteor':tone(400,.6,'sawtooth',.04,80);noise(.6,.08,800,.6,0,200);break;
+    case'timestop':tone(880,.6,'sine',.06,220);tone(1320,.8,'triangle',.04,330,.1);break;
+    case'spikes':noise(.15,.1,2200,2);break;
     case'salvage':noise(.25,.1,1800,1,0,300);tone(400,.2,'triangle',.05,150);break;
   }}
 
@@ -633,13 +639,13 @@ function isNight(){return sunLevel()<.12}
 function dmgMult(){return P.buffs.rage?1.5:1}
 
 function newGame(seed){
-  W=genWorld(seed??((Math.random()*1e9)|0));W.loot=[];inDungeon=false;dun=null;overStash=null;placeDungeonEntrances();placeTower();autoT=120;
+  W=genWorld(seed??((Math.random()*1e9)|0));W.loot=[];inDungeon=false;dun=null;overStash=null;artT={};freezeT=0;placeDungeonEntrances();placeTower();autoT=120;
   explored=new Uint8Array(MW*MH);initMinimap();chunkCache.clear();
   const c=W.castle;
   P={x:(c.coffin.x+.5)*TILE,y:(c.coffin.y+1.6)*TILE,r:11,hp:100,maxHp:100,blood:70,maxBlood:100,lvl:1,xp:0,next:50,atk:14,speed:155,face:Math.PI/2,
     combo:0,lastAtk:-9,atkCd:0,atkAnim:0,atkAnimMax:.22,inv:0,hurt:0,mist:0,cast:0,walkT:0,moving:false,biting:null,biteTarget:null,kills:0,drained:0,
     buffs:{},cds:{bolt:0,bats:0,mist:0,nova:0},lvx:0,lvy:0,dead:false,resting:false,inSun:false,reason:'',
-    attr:{str:5,agi:5,vit:5,int:5},pts:0,gold:30,tp:0,tal:{},frenzy:0,undyingCd:0,undyT:0,npcTarget:null,bagExp:0,dunClears:{},towerBest:0,towerStock:null,quests:[],mainIdx:0,visited:[],board:null,boardDay:0,bossKills:0,bag:Array(24).fill(null),eq:{weapon:null,cloak:null,ring:null,amulet:null},chestTarget:null};
+    attr:{str:5,agi:5,vit:5,int:5},pts:0,gold:30,tp:0,tal:{},frenzy:0,undyingCd:0,undyT:0,npcTarget:null,bagExp:0,dunClears:{},towerBest:0,towerStock:null,quests:[],mainIdx:0,visited:[],board:null,boardDay:0,bossKills:0,bag:Array(24).fill(null),eq:{weapon:null,armor:null,cloak:null,boots:null,ring:null,amulet:null,art0:null},chestTarget:null};
   recalc();P.hp=P.maxHp;P.bag[0]=makeCons('hp',2);sel=null;selTal=null;initMerchants();ensureQuestState();
   humans=[];enemies=[];projs=[];bats=[];effects=[];parts=[];texts=[];corpses=[];
   for(const v of W.villages){const n=4+(Math.random()*3|0);for(let i=0;i<n;i++)spawnHuman(v)}
@@ -661,8 +667,8 @@ function spawnHuman(v,at){
     face:rand(0,6.28),stun:0,flash:0,atkCd:0,windup:0,swing:0,walkT:0,kx:0,ky:0,fleeT:0,side:Math.random()<.5?1:-1,aggro:false,seed:Math.random()*10});
 }
 function randomVillagePoint(v){for(let i=0;i<14;i++){const tx=v.x+Math.round(rand(-8,8)),ty=v.y+Math.round(rand(-8,8));const t=tileAt(tx,ty);if(!SOLID[t]&&t!==T.FLOOR)return{x:(tx+.5)*TILE,y:(ty+.5)*TILE}}return null}
-function spawnEnemy(type,x,y){const D=ENEMIES[type];const sc=1+.18*(day-1);
-  const e={kind:'e',type,x,y,r:D.r,hp:D.hp*sc,maxHp:D.hp*sc,dmg:D.dmg*(1+.1*(day-1)),spd:D.spd,state:'idle',cd:rand(.5,1.5),face:rand(0,6.28),flash:0,windup:0,act:'',
+function spawnEnemy(type,x,y){const D=ENEMIES[type];const sc=1+.15*(day-1)+.06*((P?P.lvl:1)-1);
+  const e={kind:'e',type,x,y,r:D.r,hp:D.hp*sc,maxHp:D.hp*sc,dmg:D.dmg*(1+.08*(day-1)+.035*((P?P.lvl:1)-1)),spd:D.spd,state:'idle',cd:rand(.5,1.5),face:rand(0,6.28),flash:0,windup:0,act:'',
     lungeT:0,lungeCd:rand(0,1.5),lvx:0,lvy:0,lungeHit:false,kx:0,ky:0,wanderA:rand(0,6.28),wt:0,idle:false,walkT:0,alert:0,stun:0,swing:0,strafe:Math.random()<.5?1:-1,seed:Math.random()*10,fade:0};
   enemies.push(e);return e}
 function findSpawn(minD,maxD){for(let i=0;i<30;i++){const a=rand(0,6.283),d=rand(minD,maxD);const tx=Math.floor((P.x+Math.cos(a)*d)/TILE),ty=Math.floor((P.y+Math.sin(a)*d)/TILE);
@@ -684,7 +690,7 @@ function vibrate(ms){try{if(isTouch&&navigator.vibrate)navigator.vibrate(ms)}cat
 // ================= 戰鬥 =================
 function healP(n){if(P.dead)return;P.hp=Math.min(P.maxHp,P.hp+n)}
 function addBlood(n){P.blood=clamp(P.blood+n,0,P.maxBlood)}
-function hurtPlayer(dmg,src){if(P.dead||P.inv>0||P.mist>0)return;if(P.sleeping)wakeUp('⚠ 你在沉睡中遭到攻擊！');dmg*=60/(60+Math.max(0,P.st.def));P.hp-=dmg;P.inv=.45;P.hurt=.3;shake(6);vibrate(40);
+function hurtPlayer(dmg,src){if(P.dead||P.inv>0||P.mist>0)return;if(P.sleeping)wakeUp('⚠ 你在沉睡中遭到攻擊！');dmg*=60/(60+Math.max(0,P.st.def));P.hp-=dmg;artOnHurt();P.inv=.45;P.hurt=.3;shake(6);vibrate(40);
   burst(P.x,P.y-20,8,'#b0001a',160);floatText(P.x,P.y-50,'-'+Math.round(dmg),'#ff5060',16);sfx('hurt');if(P.biting)cancelBite('吸血被打斷了！');P.reason=src}
 function hurtEnt(e,dmg,ang,kb,crit){if(e.dead)return;if(e.kind==='e'&&e.hp<e.maxHp*.3)dmg*=1+.25*TL('exec');if(isNight())dmg*=1+.1*TL('night');if(crit)shake(4);
   e.hp-=dmg;e.flash=.12;const kbm=e.kind==='e'&&ENEMIES[e.type].boss?.25:1;e.kx+=Math.cos(ang)*kb*kbm;e.ky+=Math.sin(ang)*kb*kbm;
@@ -772,7 +778,7 @@ function update(dt){
   for(const c of corpses)c.t-=dt;corpses=corpses.filter(c=>c.t>0);
   updateRoofs(dt);updateLoot(dt);updateAmbience(dt);
   autoT-=dt;if(autoT<=0){autoT=120;saveGame('auto',true)}
-  updateQuests(dt);updateAch(dt);updateDay(dt);updateDungeon(dt);
+  updateQuests(dt);updateAch(dt);updateDay(dt);updateDungeon(dt);updateArtifacts(dt);
   // 鏡頭
   const tx=P.x-VW/(2*ZOOM),ty=P.y-20-VH/(2*ZOOM);const k=1-Math.exp(-8*dt);camX+=(tx-camX)*k;camY+=(ty-camY)*k;
   shakeA*=Math.exp(-10*dt);if(shakeA<.1)shakeA=0}
@@ -880,7 +886,7 @@ function updateEnemies(dt){const night=isNight();
     if(e.type==='wraith'&&Math.random()<dt*6)addP({x:e.x+rand(-8,8),y:e.y-8,vx:0,vy:rand(5,20),life:.6,max:.6,size:3,color:'150,190,240',drag:.97,grav:0,kind:'s'});
     const aggroR=(D.aggro||330)*(night?1.15:1);
     const see=!P.dead&&P.mist<=0&&(d<aggroR||e.alert>0);
-    const spd=e.spd*(night&&e.type!=='hunter'?1.08:1);
+    if(e.slowT>0)e.slowT-=dt;const spd=e.spd*(night&&e.type!=='hunter'?1.08:1)*(e.slowT>0?.5:1);
     if(e.state==='lunge'){e.lungeT-=dt;moveEnt(e,e.lvx*dt,e.lvy*dt,who);e.walkT+=dt*2;
       if(Math.random()<.6)addP({x:e.x,y:e.y,vx:0,vy:0,life:.25,max:.25,size:e.r*.8,color:'60,40,40',drag:1,grav:0,kind:'s'});
       if(!e.lungeHit&&d<e.r+P.r+6){e.lungeHit=true;hurtPlayer(e.dmg*1.25,`被${D.name}撲殺`)}
@@ -917,7 +923,7 @@ function spawnManager(dt){if(inDungeon)return;spawnT-=dt;if(spawnT>0)return;spaw
   const nearGrave=W.graves.some(g=>Math.hypot(g.x*TILE-pt.x,g.y*TILE-pt.y)<14*TILE);
   let type;if(nearGrave&&Math.random()<.65)type=night&&Math.random()<.45?'wraith':'ghoul';
   else if(night)type=pickW({ghoul:3,werewolf:day>=1?3:1,wraith:2,hunter:.6});else type=tileAtPx(pt.x,pt.y)===T.FOREST?pickW({ghoul:3,hunter:1}):pickW({hunter:4,ghoul:2});
-  spawnEnemy(type,pt.x,pt.y);
+  {const ne=spawnEnemy(type,pt.x,pt.y);if(Math.random()<.04+day*.012)makeWorldElite(ne)}
   if(type==='werewolf'&&Math.random()<.35){const nx=pt.x+rand(-40,40),ny=pt.y+rand(-40,40);if(!blocked(nx,ny,12,'e'))spawnEnemy('werewolf',nx,ny)}}
 
 function updateProjs(dt){
@@ -926,9 +932,9 @@ function updateProjs(dt){
         if(Math.abs(df)<1.1){const na=cur+clamp(df,-6*dt,6*dt),sp=Math.hypot(p.vx,p.vy);p.vx=Math.cos(na)*sp;p.vy=Math.sin(na)*sp}}
       addP({x:p.x,y:p.y-16,vx:rand(-20,20),vy:rand(-20,20),life:.35,max:.35,size:rand(2,4),color:'#ff2040',drag:.9,grav:0,kind:'c'})}
     else if(Math.random()<.5)addP({x:p.x,y:p.y-16,vx:0,vy:0,life:.2,max:.2,size:1.5,color:PCOL[p.type]||'#dde8ff',drag:1,grav:0,kind:'c'});
-    if(p.owner==='e')projSteer(p,dt);p.x+=p.vx*dt;p.y+=p.vy*dt;
+    if(p.owner==='e'){if(freezeT>0){p.life+=dt;continue}projSteer(p,dt)}p.x+=p.vx*dt;p.y+=p.vy*dt;
     if(p.life<=0||PROJ_BLOCK[tileAtPx(p.x,p.y)]){p.dead=true;if(p.type==='bolt')boltBoom(p,null);continue}
-    if(p.owner==='p'){for(const e of enemies.concat(humans)){if(e.dead)continue;if(Math.hypot(e.x-p.x,e.y-p.y)<e.r+p.r){{const[cd,cr]=rollCrit(p.dmg);hurtEnt(e,cd,Math.atan2(p.vy,p.vx),200,cr)}boltBoom(p,e);p.dead=true;break}}}
+    if(p.owner==='p'){for(const e of enemies.concat(humans)){if(e.dead)continue;if(Math.hypot(e.x-p.x,e.y-p.y)<e.r+p.r){{const[cd,cr]=rollCrit(p.dmg);hurtEnt(e,cd,Math.atan2(p.vy,p.vx),200,cr)}if(p.type==='bolt')boltBoom(p,e);else burst(p.x,p.y-16,6,PCOL[p.type]||'#fff',120,2,.3);p.dead=true;break}}}
     else if(!P.dead&&Math.hypot(P.x-p.x,P.y-p.y)<P.r+p.r&&P.mist<=0){hurtPlayer(p.dmg,p.src||'被獵魔人的銀箭射穿');p.dead=true;burst(p.x,p.y-16,6,'#dde8ff',120,2,.3)}}
   projs=projs.filter(p=>!p.dead)}
 function boltBoom(p,skip){sfx('boom');burst(p.x,p.y-16,16,'#ff2040',200,3,.5);effects.push({type:'ring',x:p.x,y:p.y,t:0,dur:.3,R:48,color:'255,40,70'});
@@ -939,11 +945,13 @@ function updateBats(dt){
     let tx,ty;if(b.target&&!b.target.dead){tx=b.target.x;ty=b.target.y}else{const oa=b.t*4+b.i*.785;tx=P.x+Math.cos(oa)*46;ty=P.y+Math.sin(oa)*46}
     const want=Math.atan2(ty-b.y,tx-b.x);b.a+=clamp(angDiff(want,b.a),-8*dt,8*dt)+Math.sin(b.t*9+b.i)*.05;
     b.x+=Math.cos(b.a)*b.spd*dt;b.y+=Math.sin(b.a)*b.spd*dt;
-    if(b.target&&!b.target.dead&&b.hitCd<=0&&Math.hypot(b.target.x-b.x,b.target.y-b.y)<b.target.r+8){hurtEnt(b.target,P.atk*.6*dmgMult()*(1+P.st.skill/100),b.a,50);healP(1.5);b.hits++;b.hitCd=.35;sfx('batbite');if(b.hits>=4)b.life=0}
+    if(b.target&&!b.target.dead&&b.hitCd<=0&&Math.hypot(b.target.x-b.x,b.target.y-b.y)<b.target.r+8){hurtEnt(b.target,P.atk*(b.perm?.45*b.pw:.6)*dmgMult()*(1+P.st.skill/100),b.a,50);healP(1.5);b.hits++;b.hitCd=.35;sfx('batbite');if(b.hits>=4&&!b.perm)b.life=0}
     if(b.life<=0){b.dead=true;smoke(b.x,b.y,3,'40,10,30')}}
   bats=bats.filter(b=>!b.dead)}
 function updateEffects(dt){
   for(const f of effects){f.t+=dt;if(f.follow){f.x=P.x;f.y=P.y}
+    if(f.type==='meteor'){if(f.t<.6&&Math.random()<.8){const h=(1-f.t/.6)*320;addP({x:f.x+h*.4+rand(-4,4),y:f.y-h,vx:rand(-20,20),vy:rand(-30,0),life:.4,max:.4,size:3,color:'#ff7a30',drag:.95,grav:0,kind:'c'})}
+      if(!f.hit&&f.t>=.6){f.hit=true;sfx('boom');shake(7);burst(f.x,f.y-10,30,'#ff7030',260,4,.7);for(const e of enemies){if(e.dead)continue;if(Math.hypot(e.x-f.x,e.y-f.y)<f.R+e.r){const[d,c]=rollCrit(f.dmg);hurtEnt(e,d,Math.atan2(e.y-f.y,e.x-f.x),260,c)}}}}
     if(f.type==='holy'&&!f.hit&&f.t>=1){f.hit=true;sfxAt('holyHit',f.x,f.y);shake(6);burst(f.x,f.y-20,24,'#fff0a0',220,3,.6);if(!P.dead&&Math.hypot(P.x-f.x,P.y-f.y)<f.R)hurtPlayer(24*(1+.1*(day-1)),'被聖光審判淨化')}
     if(f.type==='nova'){const R=f.R*(1-Math.pow(1-Math.min(1,f.t/f.dur),3));if(f.hit.size>=5&&!f.ach){f.ach=1;achStat('nova5')}
       for(const e of enemies){if(e.dead||f.hit.has(e))continue;if(Math.hypot(e.x-f.x,e.y-f.y)<=R+e.r){f.hit.add(e);const[dmg,cr]=rollCrit(P.atk*2.6*dmgMult()*(1+P.st.skill/100));hurtEnt(e,dmg,Math.atan2(e.y-f.y,e.x-f.x),380,cr);healP(dmg*(TL('bloodmoon')?.4:.25))}}}}
@@ -1085,7 +1093,7 @@ function drawEnemy(e){ctx.save();ctx.translate(e.x,e.y);ctx.scale(CS,CS);if(e.el
     if(tele){ctx.strokeStyle='#eef';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(6,cy);ctx.lineTo(21,cy);ctx.stroke()}
     circle(4,cy+1,1.8,'#e0b890')}
   ctx.restore();flashOver(e,EH[e.type]*(e.type==='alpha'?1:1),9*sc);
-  if(e.stun>2){ctx.fillStyle='rgba(200,0,30,.35)';ctx.beginPath();ctx.ellipse(e.x,e.y-EH[e.type]/2,e.r,EH[e.type]/2,0,0,7);ctx.fill()}
+  if(e.frozen>gameTime||e.slowT>0){ctx.fillStyle=e.frozen>gameTime?'rgba(140,200,255,.4)':'rgba(140,200,255,.22)';ctx.beginPath();ctx.ellipse(e.x,e.y-EH[e.type]*CS/2,e.r*CS,EH[e.type]*CS/2,0,0,7);ctx.fill()}else if(e.stun>2){ctx.fillStyle='rgba(200,0,30,.35)';ctx.beginPath();ctx.ellipse(e.x,e.y-EH[e.type]/2,e.r,EH[e.type]/2,0,0,7);ctx.fill()}
   drawHp(e)}
 function drawHp(e){const bs=ENEMIES[e.type].boss;if(e.hp>=e.maxHp&&!bs&&!e.elite)return;const w=bs?60:28,y=e.y-EH[e.type]*CS-10;
   ctx.fillStyle='rgba(0,0,0,.7)';ctx.fillRect(e.x-w/2-1,y-1,w+2,5);ctx.fillStyle=e.hp<e.maxHp*.35&&!ENEMIES[e.type].boss&&e.type!=='wraith'?'#ff60a0':'#d02030';ctx.fillRect(e.x-w/2,y,w*Math.max(0,e.hp/e.maxHp),3)}
@@ -1149,6 +1157,11 @@ function drawEffect(f){const p=f.t/f.dur;
   else if(f.type==='cast'){ctx.save();ctx.translate(f.x,f.y+2);ctx.scale(1,.55);ctx.rotate(f.t*5);const a=1-p;
     ctx.strokeStyle=`rgba(${f.color},${a})`;ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,26,0,7);ctx.stroke();ctx.beginPath();ctx.arc(0,0,18,0,7);ctx.stroke();
     ctx.beginPath();for(let k=0;k<6;k++){const an=k*Math.PI/3;ctx.moveTo(Math.cos(an)*26,Math.sin(an)*26);ctx.lineTo(Math.cos(an+Math.PI*2/3)*26,Math.sin(an+Math.PI*2/3)*26)}ctx.stroke();ctx.restore()}
+  else if(f.type==='frost'){const R=f.R*(.3+.7*p);ctx.strokeStyle=`rgba(170,220,255,${1-p})`;ctx.lineWidth=5*(1-p)+1;ctx.beginPath();ctx.ellipse(f.x,f.y,R,R*.6,0,0,7);ctx.stroke();ctx.fillStyle=`rgba(150,210,255,${.18*(1-p)})`;ctx.beginPath();ctx.ellipse(f.x,f.y,R,R*.6,0,0,7);ctx.fill()}
+  else if(f.type==='zap'){ctx.strokeStyle=`rgba(190,225,255,${1-p})`;ctx.lineWidth=2.5;ctx.shadowColor='#8cf';ctx.shadowBlur=10;ctx.beginPath();for(let i=0;i<f.pts.length-1;i++){const a=f.pts[i],b=f.pts[i+1];ctx.moveTo(a.x,a.y);for(let q=1;q<=5;q++){const t=q/5;ctx.lineTo(a.x+(b.x-a.x)*t+(q<5?rand(-7,7):0),a.y+(b.y-a.y)*t+(q<5?rand(-7,7):0))}}ctx.stroke();ctx.shadowBlur=0}
+  else if(f.type==='meteor'){if(f.t<.6){const q=f.t/.6,h=(1-q)*320;ctx.strokeStyle=`rgba(255,80,40,${.4+.4*Math.sin(gameTime*20)})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(f.x,f.y,f.R,f.R*.55,0,0,7);ctx.stroke();
+      const g=ctx.createRadialGradient(f.x+h*.4,f.y-h,1,f.x+h*.4,f.y-h,16);g.addColorStop(0,'#fff0c0');g.addColorStop(.4,'#ff6020');g.addColorStop(1,'rgba(255,40,0,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(f.x+h*.4,f.y-h,16,0,7);ctx.fill()}
+    else{const q=(f.t-.6)/.3;ctx.fillStyle=`rgba(255,120,40,${.5*(1-q)})`;ctx.beginPath();ctx.ellipse(f.x,f.y,f.R*(.6+.6*q),f.R*.55*(.6+.6*q),0,0,7);ctx.fill()}}
   else if(f.type==='holy')drawHoly(f);
   else if(f.type==='lvl'){const a=1-p;ctx.strokeStyle=`rgba(255,210,80,${a})`;ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(f.x,f.y-p*44,20+p*12,8+p*5,0,0,7);ctx.stroke();
     ctx.beginPath();ctx.ellipse(f.x,f.y,30*p+10,12*p+4,0,0,7);ctx.stroke();if(Math.random()<.5)addP({x:f.x+rand(-14,14),y:f.y-rand(0,10),vx:0,vy:-80,life:.6,max:.6,size:2,color:'#ffd040',drag:1,grav:0,kind:'c'})}}
@@ -1198,6 +1211,7 @@ function render(){
     case 5:drawRoof(it.h);break;
     case 6:{const e=it.e;if(e===P)drawPlayer();else if(e.kind==='h')drawHuman(e);else drawEnemy(e);break}
     case 7:drawBat(it.e);break;case 8:drawProj(it.e);break}}
+  drawArtFX();
   if(!P.dead){ctx.globalAlpha=.28;drawPlayer();ctx.globalAlpha=1}
   for(const f of effects)if(f.type==='slash')drawEffect(f);
   for(const p of parts){const a=Math.max(0,p.life/p.max);
@@ -1232,8 +1246,9 @@ function drawLighting(cX,cY){const sun=inDungeon?0:sunLevel(),dark=inDungeon?.9:
     const L=(x,y,r,a)=>{const[s,t]=toS(x,y),R=r*ZOOM*LS;if(s<-R||t<-R||s>lightCv.width+R||t>lightCv.height+R)return;const g=lctx.createRadialGradient(s,t,0,s,t,R);g.addColorStop(0,`rgba(0,0,0,${a})`);g.addColorStop(1,'rgba(0,0,0,0)');lctx.fillStyle=g;lctx.beginPath();lctx.arc(s,t,R,0,7);lctx.fill()};
     L(P.x,P.y-16,250,.92);
     for(const p of projs)L(p.x,p.y-16,80,.7);
-    for(const f of effects){if(f.type==='nova')L(f.x,f.y,f.R*1.1,.8);if(f.type==='holy')L(f.x,f.y,f.R*2,.85);if(f.type==='ring')L(f.x,f.y,f.R*1.4,.4)}
+    for(const f of effects){if(f.type==='nova')L(f.x,f.y,f.R*1.1,.8);if(f.type==='holy')L(f.x,f.y,f.R*2,.85);if(f.type==='meteor')L(f.x,f.y,140,.8);if(f.type==='zap'&&f.pts[1])L(f.pts[1].x,f.pts[1].y,120,.7);if(f.type==='frost')L(f.x,f.y,f.R,.5);if(f.type==='ring')L(f.x,f.y,f.R*1.4,.4)}
     for(const h of W.houses){const x=h.home.x,y=h.home.y;if(Math.abs(x-P.x)<900&&Math.abs(y-P.y)<700)L(x,y,h.w*TILE*.75,.75)}
+    if(P.artAura)L(P.x,P.y,P.artAura.R*1.5,.55);
     for(const t of torches)L(t.x,t.y,120,.8);
     for(const l of W.loot)if(l.item.rar>=2)L(l.x,l.y-10,60,.6);
     L((W.castle.cx+.5)*TILE,(W.castle.cy+.5)*TILE,240,.5);
@@ -1244,7 +1259,7 @@ function drawLighting(cX,cY){const sun=inDungeon?0:sunLevel(),dark=inDungeon?.9:
     if(isNight())for(const h of W.houses)glow(h.home.x,(h.y+h.h)*TILE-14,90,'rgba(255,160,60,.16)');
     ctx.globalCompositeOperation='source-over'}
   if(sun>0&&sun<1){const w=Math.max(0,1-Math.abs(sun-.4)/.4);if(w>0){ctx.fillStyle=`rgba(255,120,50,${.12*w})`;ctx.fillRect(0,0,VW,VH)}}
-  if(sun>=.6&&weather==='clear'){ctx.fillStyle=`rgba(255,230,160,${.06*sun})`;ctx.fillRect(0,0,VW,VH)}drawWeather()}
+  if(sun>=.6&&weather==='clear'){ctx.fillStyle=`rgba(255,230,160,${.06*sun})`;ctx.fillRect(0,0,VW,VH)}drawWeather();if(freezeT>0){ctx.fillStyle=`rgba(120,180,255,${Math.min(.18,freezeT*.1)})`;ctx.fillRect(0,0,VW,VH)}}
 
 // ================= 小地圖 / 大地圖 =================
 const mini=document.getElementById('mini'),mctx=mini.getContext('2d');
@@ -1384,7 +1399,7 @@ function recalc(){const a=P.attr,eq={};for(const s in P.eq){const it=P.eq[s];if(
   P.st={atk:14+L*3+(a.str-5)*2+g('atk'),def:(a.vit-5)+g('def'),hp:100+L*15+(a.vit-5)*10+g('hp'),blood:100+L*10+(a.int-5)*6+g('blood'),
     crit:Math.min(75,5+(a.agi-5)*.8+g('crit')),critDmg:150+(a.str-5)+g('critDmg'),spd:(a.agi-5)*.6+g('spd'),aspd:(a.agi-5)+g('aspd'),
     ls:g('ls'),sun:Math.min(80,g('sun')),skill:(a.int-5)*3+g('skill'),cdr:Math.min(40,(a.int-5)*.5+g('cdr'))};
-  P.st.hp*=1+.05*TL('thick');P.st.crit=Math.min(75,P.st.crit+3*TL('instinct'));P.st.sun=Math.min(80,P.st.sun+10*TL('sunres'));{const lg=legacyLv();P.st.atk*=1+lg*.01;P.st.hp*=1+lg*.01}
+  P.st.hp*=1+.05*TL('thick');P.st.crit=Math.min(75,P.st.crit+3*TL('instinct'));P.st.sun=Math.min(80,P.st.sun+10*TL('sunres'));{const lg=legacyLv();P.st.atk*=1+lg*.01;P.st.hp*=1+lg*.01}for(const k in P.eq){const it=P.eq[k];if(it&&it.kind==='art'){if(it.aid==='heart')P.st.hp*=1+[.08,.12,.18][it.rar-2];if(it.aid==='hourglass')P.st.cdr=Math.min(50,P.st.cdr+[15,18,20][it.rar-2])}}
   P.maxHp=Math.round(P.st.hp);P.hp=Math.min(P.hp,P.maxHp);P.maxBlood=Math.round(P.st.blood);P.blood=Math.min(P.blood,P.maxBlood);
   P.atk=P.st.atk;P.speed=155*(1+P.st.spd/100);
   const dk=h=>{const n=parseInt(h.slice(1),16);return`rgb(${(n>>16&255)*.5|0},${(n>>8&255)*.5|0},${(n&255)*.5|0})`};
@@ -1393,21 +1408,35 @@ function rollCrit(d){if(Math.random()*100<P.st.crit){sfx('crit');achStat('crits'
 
 // ================= 道具 =================
 const RAR=[{n:'普通',c:'#c8c8c8'},{n:'精良',c:'#4ade80'},{n:'稀有',c:'#4aa8ff'},{n:'史詩',c:'#c06cff'},{n:'傳說',c:'#ffa830'}];
-const SLOTS={weapon:{n:'武器',icon:'🗡️'},cloak:{n:'披風',icon:'🧥'},ring:{n:'戒指',icon:'💍'},amulet:{n:'護符',icon:'📿'}};
+const SLOTS={weapon:{n:'武器',icon:'🗡️'},armor:{n:'護甲',icon:'🛡️'},cloak:{n:'披風',icon:'🧥'},boots:{n:'靴子',icon:'👢'},ring:{n:'戒指',icon:'💍'},amulet:{n:'護符',icon:'📿'},art0:{n:'神器',icon:'🔮'}};
 const EQB={
-  weapon:{names:['骨爪','鏽蝕匕首','血刃匕首','月光鐮刀','暗影利爪','深淵之牙'],icons:['🗡️','🔪','⚔️'],main:{atk:[4,1.2]},pool:['crit','critDmg','aspd','ls','atk']},
-  cloak:{names:['破舊披風','絲絨斗篷','夜幕披風','蝠翼斗篷','血王披風'],icons:['🧥','🦇'],main:{def:[2,.6],hp:[10,3]},pool:['hp','def','spd','sun','blood']},
-  ring:{names:['銅戒','銀紋戒指','紅寶石戒指','血誓之戒','月蝕指環'],icons:['💍'],main:{crit:[2,.25]},pool:['atk','crit','critDmg','ls','aspd']},
-  amulet:{names:['骨製護符','黑曜石墜飾','血晶護符','古老聖匣','夜之心'],icons:['📿','🔮'],main:{blood:[10,2.5],skill:[4,.6]},pool:['skill','cdr','blood','sun','def']}};
+  weapon:{subs:[
+    {n:'利爪',names:['骨爪','獸骨利爪','暗影利爪','深淵之爪','血王之爪'],icons:['🗡️'],main:{atk:[4,1.2],crit:[1.5,.12]},pool:['crit','critDmg','aspd','ls','atk']},
+    {n:'匕首',names:['鏽蝕匕首','血刃匕首','影刺','夜刃','弒神匕首'],icons:['🔪'],main:{atk:[3.5,1.05],aspd:[4,.3]},pool:['crit','aspd','spd','ls','atk']},
+    {n:'鐮刀',names:['農用鐮刀','月光鐮刀','收割者','亡魂之鐮','死神之鐮'],icons:['⚔️'],main:{atk:[5.5,1.5],critDmg:[8,.8]},pool:['crit','critDmg','atk','ls']},
+    {n:'血鞭',names:['荊棘鞭','皮革長鞭','血蛇之鞭','鮮血長鞭','莉莉絲之鞭'],icons:['➰'],main:{atk:[3.5,1],ls:[1,.08]},pool:['ls','aspd','atk','critDmg']},
+    {n:'法杖',names:['骨杖','黑檀法杖','血晶法杖','夜之權杖','始祖權杖'],icons:['🪄'],main:{atk:[2.5,.8],skill:[6,.6]},pool:['skill','cdr','blood','atk']}]},
+  armor:{subs:[
+    {n:'皮甲',names:['破舊皮甲','皮革背心','夜行皮甲','影獵皮甲','暗夜戰衣'],icons:['🦺'],main:{def:[2,.5],spd:[2,.15]},pool:['spd','def','hp','aspd']},
+    {n:'鎖甲',names:['生鏽鎖甲','鏈甲','黑鐵鎖甲','騎士胸甲','屠龍重甲'],icons:['🛡️'],main:{def:[3.5,.85],hp:[8,2.5]},pool:['def','hp','sun']},
+    {n:'長袍',names:['麻布長袍','血紋長袍','伯爵禮袍','秘儀長袍','始祖法袍'],icons:['👘'],main:{def:[1.5,.4],blood:[10,2.5],skill:[3,.4]},pool:['skill','cdr','blood','hp']}]},
+  cloak:{subs:[
+    {n:'披風',names:['破舊披風','絲絨披風','夜幕披風','蝠翼披風','血王披風'],icons:['🧥'],main:{def:[2,.6],hp:[10,3]},pool:['hp','def','spd','sun','blood']},
+    {n:'斗篷',names:['旅人斗篷','暗影斗篷','月蝕斗篷','幽靈斗篷','永夜斗篷'],icons:['🧣'],main:{sun:[6,.5],hp:[6,2]},pool:['sun','spd','def','blood']}]},
+  boots:{subs:[
+    {n:'輕靴',names:['舊皮靴','夜行靴','疾風靴','影步靴','虛空之靴'],icons:['👢'],main:{spd:[4,.25],aspd:[2,.15]},pool:['spd','aspd','crit','def']},
+    {n:'鐵靴',names:['鐵頭靴','守衛戰靴','黑鐵戰靴','聖殿戰靴','不朽戰靴'],icons:['🥾'],main:{def:[2,.6],hp:[6,2]},pool:['def','hp','sun']}]},
+  ring:{subs:[{n:'戒指',names:['銅戒','銀紋戒指','紅寶石戒指','血誓之戒','月蝕指環'],icons:['💍'],main:{crit:[2,.25]},pool:['atk','crit','critDmg','ls','aspd']}]},
+  amulet:{subs:[{n:'護符',names:['骨製護符','黑曜石墜飾','血晶護符','古老聖匣','夜之心'],icons:['📿','🔮'],main:{blood:[10,2.5],skill:[4,.6]},pool:['skill','cdr','blood','sun','def']}]}};
 const AFX={atk:[2,.7],def:[1.5,.5],hp:[8,3],blood:[8,2.5],crit:[2,.2],critDmg:[8,1],spd:[3,.25],aspd:[4,.4],ls:[1.5,.15],sun:[6,.6],skill:[5,.6],cdr:[2.5,.25]};
 const CONS={hp:{name:'血瓶',icon:'🧪',desc:'回復 40% 生命'},blood:{name:'鮮血之杯',icon:'🍷',desc:'回復 60 血液'},
   shadow:{name:'夜影藥劑',icon:'🌑',desc:'40 秒內免疫陽光'},rage:{name:'狂怒藥劑',icon:'🔥',desc:'30 秒內傷害 +50%'},tome:{name:'血之典籍',icon:'📕',desc:'永久獲得 1 屬性點'},tscroll:{name:'奧天塔傳送卷',icon:'📜',desc:'傳送到奧天塔的指定樓層（一次性，在地面或塔的大廳使用）'}};
 let itemUid=1;
-function makeEquip(slot,lvl,rar){const B=EQB[slot],m=1+rar*.35,stats={};lvl=Math.max(1,lvl);
-  for(const k in B.main){const[b,s]=B.main[k];stats[k]=(b+s*lvl)*m}
-  const pool=B.pool.slice();for(let i=0;i<rar&&pool.length;i++){const k=pool.splice(Math.random()*pool.length|0,1)[0],[b,s]=AFX[k];stats[k]=(stats[k]||0)+(b+s*lvl)*rand(.7,1.2)*(1+rar*.15)}
+function makeEquip(slot,lvl,rar){const B=EQB[slot],S=pick(B.subs),m=1+rar*.35,stats={};lvl=Math.max(1,lvl);
+  for(const k in S.main){const[b,sc]=S.main[k];stats[k]=(b+sc*lvl)*m}
+  const pool=S.pool.slice();for(let i=0;i<rar&&pool.length;i++){const k=pool.splice(Math.random()*pool.length|0,1)[0],[b,sc]=AFX[k];stats[k]=(stats[k]||0)+(b+sc*lvl)*rand(.7,1.2)*(1+rar*.15)}
   for(const k in stats)stats[k]=PCT.has(k)?Math.round(stats[k]*10)/10:Math.max(1,Math.round(stats[k]));
-  return{uid:itemUid++,kind:'eq',slot,name:B.names[Math.min(B.names.length-1,Math.floor(rar+Math.random()*1.6))],icon:pick(B.icons),rar,lvl,stats}}
+  return{uid:itemUid++,kind:'eq',slot,sub:S.n,name:S.names[Math.min(S.names.length-1,rar+(Math.random()<.3?1:0))],icon:pick(S.icons),rar,lvl,stats}}
 function makeCons(id,n=1){return{uid:itemUid++,kind:'cons',id,name:CONS[id].name,icon:CONS[id].icon,rar:id==='tome'?3:(id==='hp'||id==='blood')?0:1,count:n}}
 function rollRarity(bonus=0){const r=Math.random()*100-bonus-day*1.5;return r<2?4:r<8?3:r<22?2:r<50?1:0}
 function rollLoot(bonus=0,eqChance=.4){if(Math.random()<eqChance)return makeEquip(pick(Object.keys(EQB)),P.lvl+day-1,rollRarity(bonus));
@@ -1417,19 +1446,19 @@ function enemyDrops(e){const ch={ghoul:.22,werewolf:.3,hunter:.38,wraith:.28,tem
   if(ENEMIES[e.type].boss){dropItem(makeEquip(pick(Object.keys(EQB)),P.lvl+day,Math.max(3,rollRarity(30))),e.x,e.y);dropItem(rollLoot(20,1),e.x,e.y);dropItem(makeCons('tome'),e.x,e.y);return}
   dropItem(rollLoot(e.type==='hunter'?6:0),e.x,e.y)}
 function addToBag(it){if(it.kind==='cons'){const s=P.bag.find(b=>b&&b.kind==='cons'&&b.id===it.id&&b.floor===it.floor&&b.count<20);if(s){s.count+=it.count;return true}}
-  const i=P.bag.indexOf(null);if(i<0)return false;P.bag[i]=it;if(it.kind==='eq'&&it.rar===4)achStat('legend');return true}
+  const i=P.bag.indexOf(null);if(i<0)return false;P.bag[i]=it;if(it.kind==='eq'&&it.rar===4)achStat('legend');if(it.kind==='art'){achStat('arts');if(it.rar===4)achStat('artLegend')}return true}
 function updateLoot(dt){
   for(const L of W.loot){L.t+=dt;
     if(L.vz!==0||L.z>0){L.vz-=520*dt;L.z+=L.vz*dt;L.x+=L.vx*dt;L.y+=L.vy*dt;if(L.z<=0){L.z=0;if(L.vz<-70){L.vz=-L.vz*.35;L.vx*=.5;L.vy*=.5}else{L.vz=0}}}
     if(P.dead||L.t<.6)continue;const d=Math.hypot(L.x-P.x,L.y-P.y);
     if(d<64){L.x+=(P.x-L.x)*Math.min(1,dt*7);L.y+=(P.y-L.y)*Math.min(1,dt*7)}
     if(d<20){if(L.item.kind==='gold'){L.gone=true;P.gold+=L.item.amount;achStat('goldEarned',L.item.amount);floatText(P.x,P.y-66,'+'+L.item.amount+' 🪙','#ffd040',13);sfx('coin')}else if(addToBag(L.item)){L.gone=true;const it=L.item;floatText(P.x,P.y-66,`${it.icon} ${it.name}${it.count>1?' ×'+it.count:''}`,RAR[it.rar].c,13);
-        sfx(it.rar>=2?'rare':'pickup');if(it.rar>=3)toast(`✨ 獲得【${RAR[it.rar].n}】${it.name}！按 B 打開背包`,RAR[it.rar].c)}
+        sfx(it.rar>=2?'rare':'pickup');if(it.rar>=3||it.kind==='art')toast(`✨ 獲得${it.kind==='art'?'神器':''}【${RAR[it.rar].n}】${it.name}！按 B 打開背包`,RAR[it.rar].c)}
       else if(!L.full){L.full=true;toast('🎒 背包已滿！分解或丟棄一些物品','#a01030');sfx('err')}}else L.full=false}
   W.loot=W.loot.filter(l=>!l.gone&&l.t<300)}
 function openChest(c){if(c.open)return;c.open=true;questEvent('chest');achStat('chests');sfx('chest');burst(c.x,c.y-10,26,'#ffd060',180,3,.8);effects.push({type:'ring',x:c.x,y:c.y,t:0,dur:.6,R:50,color:'255,210,80'});
   if(c.tier===0){dropItem(makeEquip('weapon',1,1),c.x,c.y);dropItem(makeCons('hp',2),c.x,c.y);dropItem(makeCons('shadow'),c.x,c.y);toast('📦 城堡的寶箱！撿起裝備後按 B 打開背包穿上','#ffd040')}
-  else{const n=c.tier===2?3:2;for(let i=0;i<n;i++)dropItem(rollLoot(c.tier===2?14:6,i===0?.85:.45),c.x,c.y);toast(c.tier===2?'⚰ 墓穴寶箱開啟了！':'📦 開啟了寶箱','#ffd040')}}
+  else{const n=c.tier===2?3:2;for(let i=0;i<n;i++)dropItem(rollLoot(c.tier===2?14:6,i===0?.85:.45),c.x,c.y);if(inDungeon&&Math.random()<.15)dropItem(makeArt(P.lvl+day,10),c.x,c.y);toast(c.tier===2?'⚰ 墓穴寶箱開啟了！':'📦 開啟了寶箱','#ffd040')}}
 function useItem(it){if(!it||it.kind!=='cons')return false;
   switch(it.id){case'hp':if(P.hp>=P.maxHp){toast('生命已滿');sfx('err');return false}healP(P.maxHp*.4);floatText(P.x,P.y-60,'+'+Math.round(P.maxHp*.4),'#60ff80',15);break;
     case'blood':addBlood(60);break;case'shadow':addBuff('holy',40);break;case'rage':addBuff('rage',30);break;
@@ -1475,7 +1504,9 @@ function statLines(it,cmp){const keys=new Set([...Object.keys(it.stats),...Objec
     h+=`<div class="sl">${v?'+'+fmtV(k,v)+' '+STATN[k]:'<span style="color:#777">— '+STATN[k]+'</span>'}${cmp&&Math.abs(d)>.05?` <span style="color:${d>0?'#5f5':'#f66'}">(${d>0?'▲':'▼'}${fmtV(k,Math.abs(d))})</span>`:''}</div>`}return h}
 function infoHTML(){const it=selItem();if(!it)return'<div class="hint">點選物品查看詳情（電腦可雙擊直接裝備 / 使用）</div>';
   let h=`<div class="iname" style="color:${RAR[it.rar].c}">${it.icon} ${it.name}${it.count>1?' ×'+it.count:''}</div>`;
-  if(it.kind==='eq'){const cmp=sel.t==='bag'?P.eq[it.slot]:null;h+=`<div class="isub">${RAR[it.rar].n}・${SLOTS[it.slot].n}・物品等級 ${it.lvl}${cmp?'　（與已裝備比較）':''}</div>`+statLines(it,cmp);
+  if(it.kind==='art'){const cur=sel.t==='bag'?P.eq[it.slot]:null;h+=`<div class="isub">${RAR[it.rar].n}・神器・物品等級 ${it.lvl}</div><div class="sl" style="color:#ffd8a0">✦ ${artDesc(it)}</div>${cur?`<div class="sl" style="color:#999">目前裝備：${cur.icon} ${cur.name}</div>`:''}`;
+    h+=sel.t==='bag'?`<div class="ibtns"><button class="btn sm" data-act="equip">裝備</button><button class="btn sm sec" data-act="salvage">分解 (+${salvageXP(it)} XP)</button></div>`:`<div class="ibtns"><button class="btn sm sec" data-act="unequip">卸下</button></div>`}
+  else if(it.kind==='eq'){const cmp=sel.t==='bag'?P.eq[it.slot]:null;h+=`<div class="isub">${RAR[it.rar].n}・${SLOTS[it.slot].n}${it.sub?'（'+it.sub+'）':''}・物品等級 ${it.lvl}${cmp?'　（與已裝備比較）':''}</div>`+statLines(it,cmp);
     h+=sel.t==='bag'?`<div class="ibtns"><button class="btn sm" data-act="equip">裝備</button><button class="btn sm sec" data-act="salvage">分解 (+${salvageXP(it)} XP)</button></div>`
       :`<div class="ibtns"><button class="btn sm sec" data-act="unequip">卸下</button></div>`}
   else h+=`<div class="isub">消耗品</div><div class="sl">${CONS[it.id].desc}</div><div class="ibtns"><button class="btn sm" data-act="use">使用</button><button class="btn sm sec" data-act="drop">丟棄</button></div>`;
@@ -1515,7 +1546,7 @@ $('bagScreen').addEventListener('click',e=>{const t=e.target;
   if(b){const i=+b.dataset.bag;sel=P.bag[i]?{t:'bag',i}:null;sfx('click');renderBag();return}
   if(q){sel=P.eq[q.dataset.eq]?{t:'eq',s:q.dataset.eq}:null;sfx('click');renderBag()}});
 $('bagScreen').addEventListener('dblclick',e=>{const b=e.target.closest('[data-bag]'),q=e.target.closest('[data-eq]');
-  if(b){const i=+b.dataset.bag,it=P.bag[i];if(!it)return;sel={t:'bag',i};bagAction(it.kind==='eq'?'equip':'use')}
+  if(b){const i=+b.dataset.bag,it=P.bag[i];if(!it)return;sel={t:'bag',i};bagAction(it.kind==='cons'?'use':'equip')}
   else if(q&&P.eq[q.dataset.eq]){sel={t:'eq',s:q.dataset.eq};bagAction('unequip')}});
 $('bagClose').addEventListener('click',closeBag);
 $('bagBtn').addEventListener('click',()=>bagOpen?closeBag():openBag(P.pts>0?'attr':P.tp>0?'tal':'bag'));
@@ -1564,7 +1595,7 @@ function learnTal(){const t=TALENTS.find(x=>x.id===selTal);if(!t||!canLearn(t)){
 // ================= 商人 / 金幣 =================
 const CONS_PRICE={hp:30,blood:25,shadow:60,rage:60,tome:400,tscroll:100};
 const eqValue=it=>Math.round(12*Math.pow(it.rar+1,1.7)*(1+it.lvl*.15));
-const sellPrice=it=>it.kind==='eq'?eqValue(it):Math.max(1,Math.round(CONS_PRICE[it.id]*.3));
+const sellPrice=it=>(it.kind==='eq'||it.kind==='art')?eqValue(it)*(it.kind==='art'?2:1):Math.max(1,Math.round(CONS_PRICE[it.id]*.3));
 function dropGold(e,amt){const n=amt||(Math.random()<.65?rand(3,8)*(1+(day-1)*.3)*(ENEMIES[e.type]&&ENEMIES[e.type].boss?15:e.type==='hunter'?1.5:1):0);if(n<1)return;
   const a=Math.round(n);dropItem({kind:'gold',amount:a,icon:'🪙',name:a+' 金幣',rar:0},e.x,e.y)}
 function restock(m){m.stock=[];if(m.quest)return;if(m.tower){m.stock=towerStock(true);return}const n=m.castle?6:4;
@@ -1578,8 +1609,8 @@ function openShop(m){if(!running||P.dead)return;if(bagOpen)closeBag();shopOpen=t
 function closeShop(){if(!shopOpen)return;shopOpen=false;paused=false;$('shopScreen').classList.add('hidden');sfx('bag')}
 function stLine(it){const cmp=P.eq[it.slot];return Object.keys(it.stats).map(k=>{const d=it.stats[k]-(cmp?cmp.stats[k]||0:0);
   return`+${fmtV(k,it.stats[k])} ${STATN[k]}${cmp&&Math.abs(d)>.05?`<span style="color:${d>0?'#5f5':'#f66'}">${d>0?'▲':'▼'}</span>`:''}`}).join('・')}
-function rowHTML(it,price,attr,label,dis){const col=it.kind==='eq'?RAR[it.rar].c:it.kind==='cons'?RAR[it.rar||0].c:'#e8d8c8';
-  return`<div class="srow"><span class="sic" style="border-color:${col}">${it.icon}</span><div class="sinfo"><div style="color:${col}">${it.name}${it.count>1?' ×'+it.count:''}<small> ${it.kind==='eq'?RAR[it.rar].n+'・'+SLOTS[it.slot].n+'・Lv.'+it.lvl:''}</small></div><div class="sst">${it.kind==='eq'?stLine(it):(CONS[it.id]?CONS[it.id].desc:it.desc||'')}</div></div><button class="btn sm" ${attr} ${dis?'disabled':''}>${label} 🪙${price}</button></div>`}
+function rowHTML(it,price,attr,label,dis){const col=(it.kind==='eq'||it.kind==='art')?RAR[it.rar].c:it.kind==='cons'?RAR[it.rar||0].c:'#e8d8c8';
+  return`<div class="srow"><span class="sic" style="border-color:${col}">${it.icon}</span><div class="sinfo"><div style="color:${col}">${it.name}${it.count>1?' ×'+it.count:''}<small> ${(it.kind==='eq'||it.kind==='art')?RAR[it.rar].n+'・'+SLOTS[it.slot].n+(it.sub?'（'+it.sub+'）':'')+'・Lv.'+it.lvl:''}</small></div><div class="sst">${it.kind==='art'?artDesc(it):it.kind==='eq'?stLine(it):(CONS[it.id]?CONS[it.id].desc:it.desc||'')}</div></div><button class="btn sm" ${attr} ${dis?'disabled':''}>${label} 🪙${price}</button></div>`}
 const SERVICES=[
   {id:'bag',icon:'🎒',name:'背包擴充',desc:'背包 +8 格（上限 48 格）',price:()=>200*(P.bagExp+1),ok:()=>P.bag.length<48},
   {id:'rtal',icon:'🧠',name:'遺忘藥劑',desc:'重置所有天賦，返還天賦點',price:()=>120,ok:()=>Object.values(P.tal).some(v=>v>0)},
@@ -1875,7 +1906,7 @@ const ACH=[
   {id:'lv5',c:'成長',i:'⭐',n:'覺醒',d:'達到等級 5',r:runV(()=>P.lvl),g:5,p:5},
   {id:'lv10',c:'成長',i:'🌠',n:'血脈沸騰',d:'達到等級 10',r:runV(()=>P.lvl),g:10,p:15},
   {id:'lv20',c:'成長',i:'🧬',n:'古老血族',d:'達到等級 20',r:runV(()=>P.lvl),g:20,p:30},
-  {id:'fullEq',c:'成長',i:'🛡️',n:'全副武裝',d:'四個裝備欄位都穿上裝備',r:runV(()=>Object.values(P.eq).filter(Boolean).length),g:4,p:10},
+  {id:'fullEq',c:'成長',i:'🛡️',n:'全副武裝',d:'六個裝備欄位都穿上裝備（不含神器）',r:runV(()=>Object.entries(P.eq).filter(([k,v])=>v&&!k.startsWith('art')).length),g:6,p:10},
   {id:'legend',c:'成長',i:'🌟',n:'傳說之物',d:'獲得一件傳說裝備',s:'legend',g:1,p:20},
   {id:'cap',c:'成長',i:'✨',n:'天賦大師',d:'學會任一終極天賦',r:runV(()=>TL('undying')||TL('frenzy')||TL('bloodmoon')?1:0),g:1,p:15},
   {id:'g1k',c:'財富',i:'🪙',n:'小有積蓄',d:'累計賺取 1,000 金幣',s:'goldEarned',g:1000,p:10},
@@ -1889,7 +1920,9 @@ const ACH=[
   {id:'dunAll',c:'探索',i:'🌀',n:'深淵行者',d:'攻略全部 4 座地下城',r:()=>Object.keys(DUNGEONS).filter(k=>(PROF.st['dun_'+k]||0)>0).length,g:4,p:40},
   {id:'tw10',c:'探索',i:'🗼',n:'登塔者',d:'奧天塔到達第 10 層',r:()=>PROF.towerBest||0,g:10,p:15},
   {id:'tw50',c:'探索',i:'🏯',n:'天塔征服者',d:'奧天塔到達第 50 層',r:()=>PROF.towerBest||0,g:50,p:40},
-  {id:'tw100',c:'探索',i:'🌌',n:'奧天之巔',d:'奧天塔到達第 100 層',r:()=>PROF.towerBest||0,g:100,p:60}];
+  {id:'tw100',c:'探索',i:'🌌',n:'奧天之巔',d:'奧天塔到達第 100 層',r:()=>PROF.towerBest||0,g:100,p:60},
+  {id:'art1',c:'成長',i:'🔮',n:'神器持有者',d:'獲得第一件神器',s:'arts',g:1,p:10},
+  {id:'artLeg',c:'成長',i:'☄️',n:'傳說神器',d:'獲得一件傳說神器',s:'artLegend',g:1,p:30}];
 let PROF={ach:{},st:{}};try{const p=JSON.parse(localStorage.getItem('vampProfile')||'null');if(p)PROF={ach:p.ach||{},st:p.st||{}}}catch(e){}
 let profDirty=false,profT=1,exploredN=0,achOpen=false,achPrev=null,achShowing=false;const achQ=[];
 function saveProf(){try{localStorage.setItem('vampProfile',JSON.stringify(PROF))}catch(e){}profDirty=false}
@@ -1977,7 +2010,7 @@ document.addEventListener('touchmove',e=>{if(e.touches.length>1)e.preventDefault
 BOSSDRAW.templar=(e,mv,dir,w,atk)=>{ctx.scale(.8,.8);BOSSDRAW.inquis(e,mv,dir,w,atk)};
 
 // ================= 地下城副本 =================
-const GAME_VER='1.3.0';
+const GAME_VER='1.4.0';
 const DUNGEONS={
   crypt:{name:'墓穴迷宮',icon:'⚰️',lvl:3,desc:'墓地之下的古老墓穴，食屍鬼與骷髏在黑暗中遊蕩。',mobs:{ghoul:3,skeleton:3,wraith:2},boss:'lich',bossName:'墓穴之主（巫妖）',col:'#7fdc8a'},
   den:{name:'狼人巢穴',icon:'🐺',lvl:6,desc:'森林深處的地下洞窟，狼群在此繁衍，狼王坐鎮最深處。',mobs:{werewolf:4,ghoul:1,skeleton:1},boss:'alpha',bossName:'巢穴狼王',col:'#d8a060'},
@@ -2042,7 +2075,7 @@ function exitDungeon(msg){const s=overStash;if(!s)return;
   sfx('mist');toast(msg||'你回到了地面',isNight()?'#8060ff':'#ffb040');if(!isNight()&&sunEff()>.15)setTimeout(()=>toast('☀ 現在是白天！小心陽光','#ffa040'),1200)}
 function updateDungeon(dt){if(!inDungeon||!dun)return;if(dun.mode==='tower'){updateTower(dt);return}
   if(dun.floor===3&&W.boss&&W.boss.dead&&!dun.won){dun.won=true;const D=DUNGEONS[dun.key],bp=W.bossPt,first=P.dunClears[dun.key]!==day;
-    W.objs.push({kind:'win',x:bp.x,y:bp.y+40});achStat('dungeons');achStat('dun_'+dun.key);
+    W.objs.push({kind:'win',x:bp.x,y:bp.y+40});if(Math.random()<(first?.6:.25))dropItem(makeArt(P.lvl+day+2,D.lvl*2),bp.x,bp.y);achStat('dungeons');achStat('dun_'+dun.key);
     if(first){P.dunClears[dun.key]=day;const g=Math.round((150+P.lvl*30)*(1+D.lvl*.05));P.gold+=g;achStat('goldEarned',g);gainXP(120+D.lvl*25);
       dropItem(makeEquip(pick(Object.keys(EQB)),P.lvl+day+2,Math.max(3,rollRarity(25))),bp.x,bp.y);if(Math.random()<.5)dropItem(makeCons('tome'),bp.x,bp.y);
       toast(`🏆 攻略「${D.name}」！獲得 🪙${g}、史詩以上裝備`,'#ffd040')}
@@ -2099,7 +2132,7 @@ const TOWER_LEGENDS=[{n:'始祖 卡因',f:200},{n:'德古拉伯爵',f:150},{n:'�
 const TLABEL={tower:()=>'進入奧天塔',tgate:()=>'登塔：挑戰第 2 層',tboard:()=>'查看排行榜',taltar:()=>'傳送祭壇（使用傳送卷）',tleave:()=>'離開奧天塔',
   texit:()=>P.exitConfirm>gameTime?'再按一次返回大廳':'返回大廳（結束本次登塔）',tup:()=>`前往第 ${dun?dun.floor+1:'?'} 層`};
 Object.assign(OBJ_ICON,{tower:'🗼',tgate:'⛩️',tboard:'🏆',taltar:'🔮',tleave:'🚪',texit:'🚪',tup:'⬆️'});
-const towerHp=f=>1+.11*f+Math.pow(f/18,1.7),towerDmg=f=>1+.05*f+Math.pow(f/35,1.5);
+const towerHp=f=>1+.12*f+Math.pow(f/16,1.75),towerDmg=f=>1+.055*f+Math.pow(f/32,1.5);
 const towerKind=f=>f%50===0?'big':f%10===0?'mini':'norm';
 function makeScroll(n){return{uid:itemUid++,kind:'cons',id:'tscroll',floor:n,name:`奧天塔 ${n} 層傳送卷`,icon:'📜',rar:2,count:1}}
 function placeTower(){const r=mulberry32((W.seed^0x27d4eb2f)>>>0),c=W.castle;
@@ -2165,9 +2198,9 @@ function updateTower(dt){if(dun.floor<2||!W.boss||!W.boss.dead||dun.won)return;d
   W.objs.push({kind:'tup',x:cp.x,y:cp.y});P.gold+=g;achStat('goldEarned',g);gainXP(Math.round((20+f*6)*mult));
   if(k!=='norm'){dropItem(makeScroll(f+1),cp.x,cp.y);dropItem(makeEquip(pick(Object.keys(EQB)),il,Math.max(k==='big'?3:2,rollRarity(k==='big'?30+f/3:10+f/2))),cp.x,cp.y);if(k==='big')dropItem(makeCons('tome'),cp.x,cp.y)}
   else{if(Math.random()<.3)dropItem(makeScroll(Math.max(2,f-Math.floor(Math.random()*4))),cp.x,cp.y);if(Math.random()<.35)dropItem(makeEquip(pick(Object.keys(EQB)),il,rollRarity(f/2)),cp.x,cp.y)}
-  P.towerBest=Math.max(P.towerBest||0,f);dun.runMax=Math.max(dun.runMax,f);if(f>(PROF.towerBest||0)){PROF.towerBest=f;saveProf()}achCheck();
+  if(Math.random()<(k==='big'?1:k==='mini'?.35:.06))dropItem(makeArt(il,f/2+(k==='big'?30:0)),cp.x,cp.y);P.towerBest=Math.max(P.towerBest||0,f);dun.runMax=Math.max(dun.runMax,f);if(f>(PROF.towerBest||0)){PROF.towerBest=f;saveProf()}achCheck();
   toast(`🗼 第 ${f} 層突破！🪙${g}　中央出現了通往第 ${f+1} 層的門${k!=='norm'?`，並掉落第 ${f+1} 層傳送卷`:''}`,'#ffe08a');sfx('questClaim')}
-function eliteDrops(e){if(!e.tower)return;if(Math.random()<.6)dropGold(e,Math.round(5+e.tower*2.5));gainXP(Math.round(ENEMIES[e.type].xp*(.5+e.tower*.08)));
+function eliteDrops(e){if(!e.tower)return;if(inDungeon&&Math.random()<.04)dropItem(makeArt(P.lvl+Math.floor(e.tower/3),e.tower/3),e.x,e.y);if(Math.random()<.6)dropGold(e,Math.round(5+e.tower*2.5));gainXP(Math.round(ENEMIES[e.type].xp*(.5+e.tower*.08)));
   if(Math.random()<.12)dropItem(makeEquip(pick(Object.keys(EQB)),P.lvl+Math.floor(e.tower/3),rollRarity(e.tower/3)),e.x,e.y)}
 function useTowerObj(o){const k=o.kind;
   if(k==='tower'){enterTower(1);return true}
@@ -2211,6 +2244,59 @@ function openTowerUI(mode){towerOpen=true;paused=true;attackHeld=false;let h='';
 function closeTowerUI(){if(!towerOpen)return;towerOpen=false;paused=false;$('towerScreen').classList.add('hidden')}
 $('towerScreen').addEventListener('click',e=>{const t=e.target;if(t===$('towerScreen')||t.id==='towerClose'){closeTowerUI();return}
   const b=t.closest('[data-scroll]');if(b){const it=P.bag[+b.dataset.scroll];if(!it)return;closeTowerUI();useItem(it)}});
+
+// ================= 神器 =================
+const ARTS={
+  orbs:{n:'血環儀',i:'🔴',min:2,d:(k,pc)=>`${2+k} 顆血珠繞著自身旋轉，碰觸敵人造成攻擊力 ${pc(.4)} 的傷害`},
+  dagger:{n:'暗影匕首',i:'🗡️',min:2,d:(k,pc)=>`每 ${[1.1,.9,.7][k]} 秒向最近的敵人擲出匕首，造成攻擊力 ${pc(.6)} 的傷害`},
+  heart:{n:'不朽心臟',i:'💗',min:2,d:k=>`生命上限 +${[8,12,18][k]}%，每秒回復 ${[.5,.8,1.2][k]}% 生命`},
+  frost:{n:'霜之月輪',i:'❄️',min:3,d:(k,pc)=>`每 ${[6,5,4.2][k]} 秒釋放冰霜新星（半徑 ${[150,170,190][k]}），造成 ${pc(.8)} 傷害並緩速 50%`},
+  fire:{n:'地獄火圈',i:'🔥',min:3,d:(k,pc)=>`身邊燃起火圈（半徑 ${[85,100,115][k]}），每秒對範圍內敵人造成攻擊力 ${pc(.35)} 的傷害`},
+  bats:{n:'吸血蝠群',i:'🦇',min:3,d:(k,pc)=>`${[2,3,4][k]} 隻蝙蝠常駐身邊自動攻擊（攻擊力 ${pc(.45)}），每次命中回復生命`},
+  thorns:{n:'鮮血荊棘冠',i:'👑',min:3,d:(k,pc)=>`受到傷害時向四周射出 ${[8,10,12][k]} 根血刺，各造成攻擊力 ${pc(.5)} 的傷害`},
+  lightning:{n:'雷霆權杖',i:'⚡',min:3,d:(k,pc)=>`每 ${[2.5,2.1,1.7][k]} 秒召喚連鎖閃電，彈跳 ${[3,4,5][k]} 個敵人，各造成攻擊力 ${pc(1)} 的傷害`},
+  meteor:{n:'腥紅隕石',i:'☄️',min:4,d:(k,pc)=>`每 ${[4,3.3,2.6][k]} 秒召喚隕石轟擊附近的敵人，範圍傷害為攻擊力 ${pc(2.2)}`},
+  hourglass:{n:'時之沙漏',i:'⌛',min:4,d:k=>`冷卻縮減 +${[15,18,20][k]}%；每 ${[18,15,12][k]} 秒凝結時間 ${[2,2.5,3][k]} 秒（敵人與彈幕全部停止）`}};
+let artT={},freezeT=0;
+const artPw=it=>(1+it.lvl*.03)*(1+.15*(it.rar-2));
+function artDesc(it){const pw=artPw(it);return ARTS[it.aid].d(it.rar-2,v=>Math.round(v*pw*100)+'%')}
+function makeArt(lvl,bonus=0){const r=Math.max(2,rollRarity(bonus)),w={};for(const a in ARTS)if(ARTS[a].min<=r)w[a]=ARTS[a].min===r?2:1;
+  const aid=pickW(w),A=ARTS[aid];return{uid:itemUid++,kind:'art',aid,slot:'art0',name:A.n,icon:A.i,rar:Math.max(r,A.min),lvl:Math.max(1,Math.round(lvl)),stats:{}}}
+const equippedArts=()=>{const a=[];for(const k in P.eq)if(k.startsWith('art')&&P.eq[k])a.push(P.eq[k]);return a};
+function updateArtifacts(dt){freezeT=Math.max(0,freezeT-dt);P.artOrbs=null;P.artAura=null;if(P.dead)return;const arts=equippedArts();
+  for(const it of arts){const k=it.rar-2,pw=artPw(it),S=artT[it.uid]||(artT[it.uid]={t:1,a:0});S.t-=dt;
+    switch(it.aid){
+      case'orbs':{const n=2+k;S.a+=dt*3;P.artOrbs={n,a:S.a};
+        for(let i=0;i<n;i++){const a=S.a+i*6.283/n,gx=P.x+Math.cos(a)*52,gy=P.y+Math.sin(a)*36;
+          for(const e of enemies){if(e.dead||e.fade>0||(e._orb||0)>gameTime)continue;if(Math.hypot(e.x-gx,e.y-gy)<e.r+13){e._orb=gameTime+.7;const[d,c]=rollCrit(P.atk*.4*pw);hurtEnt(e,d,Math.atan2(e.y-P.y,e.x-P.x),80,c);burst(gx,gy-14,4,'#ff2040',80,2,.3)}}}break}
+      case'dagger':if(S.t<=0){const tg=nearestTarget(P.x,P.y,380);if(tg){S.t=[1.1,.9,.7][k];const a=Math.atan2(tg.y-P.y,tg.x-P.x);projs.push({x:P.x,y:P.y,vx:Math.cos(a)*620,vy:Math.sin(a)*620,r:5,dmg:P.atk*.6*pw,owner:'p',type:'dagger',life:.9});sfx('throw')}}break;
+      case'heart':healP(P.maxHp*[.005,.008,.012][k]*dt);if(S.t<=0){S.t=1.4;effects.push({type:'ring',x:P.x,y:P.y,t:0,dur:.5,R:28,color:'255,60,110',follow:true})}break;
+      case'frost':if(S.t<=0){const R=[150,170,190][k];if(enemies.some(e=>!e.dead&&e.fade<=0&&Math.hypot(e.x-P.x,e.y-P.y)<R)){S.t=[6,5,4.2][k];effects.push({type:'frost',x:P.x,y:P.y,t:0,dur:.6,R});sfx('frost');
+        for(const e of enemies){if(e.dead||e.fade>0)continue;if(Math.hypot(e.x-P.x,e.y-P.y)<R+e.r){const[d,c]=rollCrit(P.atk*.8*pw);hurtEnt(e,d,Math.atan2(e.y-P.y,e.x-P.x),120,c);e.slowT=2.5}}
+        for(let i=0;i<16;i++){const a=i/16*6.283;addP({x:P.x,y:P.y-10,vx:Math.cos(a)*R*1.6,vy:Math.sin(a)*R,life:.5,max:.5,size:2.5,color:'#cfeaff',drag:.9,grav:0,kind:'c'})}}}break;
+      case'fire':{const R=[85,100,115][k];P.artAura={R};if(S.t<=0){S.t=.5;for(const e of enemies){if(e.dead||e.fade>0)continue;if(Math.hypot(e.x-P.x,e.y-P.y)<R+e.r)hurtEnt(e,P.atk*.35*pw*.5,0,0)}}
+        if(Math.random()<dt*16){const a=rand(0,6.283);addP({x:P.x+Math.cos(a)*R,y:P.y+Math.sin(a)*R*.6,vx:0,vy:rand(-45,-20),life:.6,max:.6,size:2.4,color:'#ff8030',drag:.97,grav:0,kind:'c'})}break}
+      case'bats':{const n=[2,3,4][k];if(bats.filter(b=>b.perm).length<n&&S.t<=0){S.t=1.2;bats.push({x:P.x,y:P.y,a:rand(0,6.28),t:rand(0,1),life:1e9,spd:290,hits:0,hitCd:0,target:null,rt:0,i:bats.length,perm:true,pw})}break}
+      case'lightning':if(S.t<=0){let tg=nearestTarget(P.x,P.y,350);if(tg){S.t=[2.5,2.1,1.7][k];const hit=new Set(),pts=[{x:P.x,y:P.y-22}];let n=[3,4,5][k];
+        while(tg&&n-->0){hit.add(tg);pts.push({x:tg.x,y:tg.y-entH(tg)*.5});const[d,c]=rollCrit(P.atk*pw);hurtEnt(tg,d,0,40,c);let nx=null,bd=160*160;
+          for(const e of enemies){if(e.dead||e.fade>0||hit.has(e))continue;const dd=(e.x-tg.x)**2+(e.y-tg.y)**2;if(dd<bd){bd=dd;nx=e}}tg=nx}
+        effects.push({type:'zap',pts,t:0,dur:.25});sfx('zap')}}break;
+      case'meteor':if(S.t<=0){const cs=enemies.filter(e=>!e.dead&&e.fade<=0&&Math.hypot(e.x-P.x,e.y-P.y)<400);if(cs.length){S.t=[4,3.3,2.6][k];const tg=pick(cs);effects.push({type:'meteor',x:tg.x,y:tg.y,t:0,dur:.9,R:70,dmg:P.atk*2.2*pw,hit:false});sfx('meteor')}}break;
+      case'hourglass':if(S.t<=0&&enemies.some(e=>!e.dead&&e.fade<=0&&Math.hypot(e.x-P.x,e.y-P.y)<350)){S.t=[18,15,12][k];const dur=[2,2.5,3][k];freezeT=dur;
+        for(const e of enemies){if(e.dead)continue;const t=ENEMIES[e.type].boss?dur*.5:dur;e.stun=Math.max(e.stun,t);e.frozen=gameTime+t;e.windup=0}
+        sfx('timestop');floatText(P.x,P.y-70,'⌛ 時間凝結','#9cd8ff',16)}break}}
+  if(!arts.some(a=>a.aid==='bats'))for(const b of bats)if(b.perm)b.life=0}
+function artOnHurt(){for(const it of equippedArts()){if(it.aid!=='thorns')continue;const S=artT[it.uid]||(artT[it.uid]={t:0,a:0});if(S.t>0)return;S.t=.8;
+  const n=[8,10,12][it.rar-2],pw=artPw(it);for(let i=0;i<n;i++){const a=i/n*6.283;projs.push({x:P.x,y:P.y,vx:Math.cos(a)*420,vy:Math.sin(a)*420,r:6,dmg:P.atk*.5*pw,owner:'p',type:'spike',life:.5})}sfx('spikes')}}
+function drawArtFX(){if(P.dead||P.sleeping)return;
+  if(P.artAura){const R=P.artAura.R;ctx.save();ctx.translate(P.x,P.y);ctx.strokeStyle=`rgba(255,110,40,${.35+.15*Math.sin(gameTime*8)})`;ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(0,0,R,R*.6,0,0,7);ctx.stroke();
+    ctx.fillStyle='rgba(255,150,50,.75)';for(let i=0;i<12;i++){const a=gameTime*1.5+i*.5236,x=Math.cos(a)*R,y=Math.sin(a)*R*.6,h=8+4*Math.sin(gameTime*12+i);ctx.beginPath();ctx.moveTo(x-3,y);ctx.quadraticCurveTo(x,y-h*1.6,x+3,y);ctx.fill()}ctx.restore()}
+  if(P.artOrbs){const o=P.artOrbs;for(let i=0;i<o.n;i++){const a=o.a+i*6.283/o.n,x=P.x+Math.cos(a)*52,y=P.y+Math.sin(a)*36-14;
+    const g=ctx.createRadialGradient(x,y,0,x,y,11);g.addColorStop(0,'#fff0f0');g.addColorStop(.35,'rgba(255,30,60,.95)');g.addColorStop(1,'rgba(200,0,30,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,11,0,7);ctx.fill()}}}
+PDRAW.dagger=(p,y)=>{ctx.save();ctx.translate(p.x,y);ctx.rotate(Math.atan2(p.vy,p.vx));ctx.fillStyle='#d8c4ff';ctx.beginPath();ctx.moveTo(10,0);ctx.lineTo(-3,-2.6);ctx.lineTo(-3,2.6);ctx.fill();ctx.fillStyle='#4a2a6a';ctx.fillRect(-8,-1.5,5,3);ctx.restore()};
+PDRAW.spike=(p,y)=>{ctx.save();ctx.translate(p.x,y);ctx.rotate(Math.atan2(p.vy,p.vx));ctx.fillStyle='#ff2848';ctx.beginPath();ctx.moveTo(9,0);ctx.lineTo(-5,-2);ctx.lineTo(-5,2);ctx.fill();ctx.restore()};
+Object.assign(PCOL,{dagger:'#b090ff',spike:'#ff3050'});
+function makeWorldElite(e){const M=EMODS[pick(Object.keys(EMODS))];e.hp=e.maxHp=e.maxHp*2.2*(M.hp||1);e.dmg*=1.25*(M.dmg||1);e.spd*=M.spd||1;e.elite=true;e.tname=`精英・${M.n}的${ENEMIES[e.type].name}`;e.tower=Math.max(2,P.lvl+day)}
 
 // ================= 啟動 =================
 try{const b=JSON.parse(localStorage.getItem('vampBest')||'{}');if(b.score)$('best').textContent=`最佳紀錄：第 ${b.day} 天・擊殺 ${b.kills}・Lv.${b.lvl}・${b.score} 分`}catch(e){}
